@@ -5,12 +5,12 @@
 }
 
 #map {
-  width: 75vw;
+  width: 85vw;
   height: 75vh;
   background-color: #282c34;
   position: absolute;
   top: 0;
-  left: 25vw;
+  left: 15vw;
   z-index: 0;
   
 }

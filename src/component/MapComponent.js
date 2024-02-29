@@ -28,7 +28,7 @@ function markersFun(map, point) {
 const MapComponent = (props)=>{
     
     useEffect(() => {
-        const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 3);
+        const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 7);
     
         L.tileLayer('./IRAN/{z}/{x}/{y}.png', {
           tms:true,
