@@ -4,6 +4,7 @@ import MapComponent from './component/MapComponent.js';
 import AddBtn from './component/AddBtn.js';
 import NewPoint from './component/NewPoint.js';
 import './component/form.css'
+import TreeView from './component/TreeView.js';
 
 let samplePoints = [
   {Latitude: 35.73546050156551, Longitude: 51.16163671486197},
@@ -29,6 +30,9 @@ function App() {
 
   return (
     <div className="App">
+
+      <TreeView></TreeView>
+      
       <MapComponent points={points}></MapComponent>
 
       <AddBtn AddBtn={addBtnHandler}/>

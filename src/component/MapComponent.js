@@ -31,8 +31,9 @@ const MapComponent = (props)=>{
         const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 3);
     
         L.tileLayer('./IRAN/{z}/{x}/{y}.png', {
+          tms:true,
           maxZoom: 10,
-          minZoom: 2,
+          minZoom: 1,
           tileSize: 512,
           zoomOffset: -1
         }).addTo(map);
