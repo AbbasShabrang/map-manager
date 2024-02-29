@@ -1,0 +1,96 @@
+html, body {
+    min-height: 100%;
+}
+
+form, input, textarea, label, p { 
+    padding: 0;
+    margin: 0;
+    outline: none;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    color: #666;
+    line-height: 22px;
+}
+
+textarea {
+    width: calc(100% - 12px);
+    padding: 5px;
+}
+
+.testbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: inherit;
+}
+
+form {
+    width: 40%;
+    padding: 20px;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 0 8px  green; 
+}
+
+
+
+
+
+input, textarea {
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+input {
+    width: calc(100% - 10px);
+    padding: 5px;
+}
+
+input[type="date"] {
+    padding: 4px 5px;
+}
+
+textarea {
+    width: calc(100% - 12px);
+    padding: 5px;
+}
+
+.item:hover p, .item:hover i, input:hover::placeholder {
+    color:  #669999;
+}
+
+.item input:hover, .item textarea:hover {
+    border: 1px solid transparent;
+    box-shadow: 0 0 3px 0  #669999;
+    color: #669999;
+}
+
+.item {
+    position: relative;
+    margin: 10px 0;
+}
+
+.item span {
+    color: red;
+}
+
+.btn-block {
+    margin-top: 10px;
+    text-align: center;
+}
+
+button {
+    width: 150px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px; 
+    background:  rgb(7, 173, 7);
+    font-size: 16px;
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background:  rgb(1, 161, 1);
+}
