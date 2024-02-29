@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from "react";
 import L from 'leaflet';
+import 'leaflet-geometryutil';
 
+const markerList = [];
 
 function markersFun(map, point) {
     const marker = L.marker([point.Latitude, point.Longitude]).addTo(map)
           .bindPopup(point.Latitude + " , "+ point.Longitude);
 
+    markerList.push(marker);
     marker.on('mouseover', () => {
         marker.openPopup();
     });
@@ -25,6 +28,21 @@ function markersFun(map, point) {
     })
 }
 
+function calculateArcPoints(map, latlng1, latlng2, curvature) {
+    var pointCount = 100; // Number of points in the arc
+    var points = [];
+    var latlngs = [latlng1, latlng2];
+    for (var i = 0; i <= pointCount; i++) {
+        var t = i / pointCount;
+        var point = L.GeometryUtil.interpolateOnLine(map, latlngs, t);
+        var angle = L.GeometryUtil.bearing(latlng1, latlng2) - 90;
+        var distance = latlng1.distanceTo(latlng2) * curvature * Math.sin(Math.PI * t);
+        var offset = L.GeometryUtil.destination(point.latLng, angle, distance);
+        points.push(offset);
+    }
+    return points;
+}
+
 const MapComponent = (props)=>{
     
     useEffect(() => {
@@ -41,6 +59,22 @@ const MapComponent = (props)=>{
         props.points.map((point)=>{
             markersFun(map, point);
         });
+        
+        
+        
+        // Define coordinates for the polyline
+        var arcPoints = calculateArcPoints(map, markerList[0].getLatLng(), markerList[1].getLatLng(), 0.5); // 0.5 is the curvature factor, adjust as needed
+        var arcPoints2 = calculateArcPoints(map, markerList[0].getLatLng(), markerList[1].getLatLng(), 0); // 0.5 is the curvature factor, adjust as need
+        // var latlngs = [markerList[0].getLatLng(), markerList[1].getLatLng()];
+
+        // Create a polyline
+        var polyline = L.polyline(arcPoints, {color: 'red'}).addTo(map);
+        var polyline2 = L.polyline(arcPoints2, {color: 'blue'}).addTo(map);
+
+
+
+
+        
 
         map.on('dragend', () => {
             console.log('Map dragged');
