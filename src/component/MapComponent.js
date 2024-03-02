@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import L from 'leaflet';
+import L, { map } from 'leaflet';
 import 'leaflet-geometryutil';
 
 const markerList = [];
@@ -43,8 +43,17 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
     return points;
 }
 
+function changeCursorIcon(map, isAddMarker) {
+    if (isAddMarker) {
+        map.getContainer().style.cursor = 'pointer';
+    } else {
+        map.getContainer().style.cursor = '';
+    }
+}
+
 const MapComponent = (props)=>{
-    
+    const [map, setMap] = useState(null);
+
     useEffect(() => {
         const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 7);
     
@@ -55,10 +64,12 @@ const MapComponent = (props)=>{
           tileSize: 512,
           zoomOffset: -1
         }).addTo(map);
+        setMap(map);
     
         props.points.map((point)=>{
             markersFun(map, point);
         });
+
         
         
         
@@ -68,8 +79,14 @@ const MapComponent = (props)=>{
         // var latlngs = [markerList[0].getLatLng(), markerList[1].getLatLng()];
 
         // Create a polyline
-        var polyline = L.polyline(arcPoints, {color: 'red'}).addTo(map);
-        var polyline2 = L.polyline(arcPoints2, {color: 'blue'}).addTo(map);
+        var polyline = L.polyline(arcPoints, {color: 'red', stroke: true, weight: 5}).addTo(map);
+        var polyline2 = L.polyline(arcPoints2, {color: 'blue', stroke: true, weight: 5}).addTo(map);
+
+        // polyline.addEventListener('mouseover', ()=>{
+        //     arcPoints.map((x)=>{
+        //         console.log(x);
+        //     })
+        // });
 
 
 
@@ -97,7 +114,7 @@ const MapComponent = (props)=>{
 
         // console.log(map.getCenter()); 
         
-        console.log(map.getBounds()); 
+        // console.log(map.getBounds()); 
         
         // map.removeLayer(firstMarker)
 
@@ -137,6 +154,10 @@ const MapComponent = (props)=>{
 
       }, [props.points]);
 
+    useEffect(()=>{
+        if (!map) return;
+        changeCursorIcon(map, props.isAddMarker);
+    }, [map, props.isAddMarker]);
       
 
     return(

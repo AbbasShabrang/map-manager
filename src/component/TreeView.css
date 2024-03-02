@@ -9,6 +9,10 @@
     padding: 1vw;
 }
 
+.make-tv-active{
+  color: brown;
+}
+
 ul{
     padding-inline-start: 30px;
 }
