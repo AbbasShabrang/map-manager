@@ -18,6 +18,12 @@ function App() {
   const [points, setPoints] = useState(samplePoints);
   const [isAddMarker, setIsAddMarker] = useState(false);
 
+
+  const addPoint = (newPoint) => {
+    setPoints([...points, newPoint]);
+    console.log(points);
+  };
+
   useEffect(()=>{
     console.log(isAddMarker);
   },[isAddMarker]);
@@ -44,7 +50,7 @@ function App() {
     <div className="App">
       <TreeView turnOnIsMarker={turnOnIsMarker}></TreeView>
       <DataView></DataView>
-      <MapComponent points={points} isAddMarker={isAddMarker}></MapComponent>
+      <MapComponent points={points} addPoint={addPoint} isAddMarker={isAddMarker}></MapComponent>
       <AddBtn AddBtn={addBtnHandler}/>
       {
         addNewPoint &&
