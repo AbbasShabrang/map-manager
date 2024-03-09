@@ -2,51 +2,40 @@ import React, {useEffect, useState, useContext} from "react";
 import './TreeView.css';
 import StateContext from '../store/state-contex';
 
+const isOpenList = [true, false, false, false]
+
 const TreeView = (props)=>{
-    const [isOpen, setIsOpen] = useState(true);
-    const [isOpen2, setIsOpen2] = useState(false);
-    const [isOpen3, setIsOpen3] = useState(false);
-    const [isOpen4, setIsOpen4] = useState(false);
+    const [isOpen, setIsOpen] = useState(isOpenList);
 
 
     const ctx = useContext(StateContext);
 
-    const handleToggle = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const handleToggle2 = () => {
-        setIsOpen2(!isOpen2);
-    };
-
-    const handleToggle3 = () => {
-        setIsOpen3(!isOpen3);
-    };
-
-    const handleToggle4 = () => {
-        setIsOpen4(!isOpen4);
+    const handleToggle = (index) => {
+        const updatedIsOpen = [...isOpen];
+        updatedIsOpen[index] = !updatedIsOpen[index];
+        setIsOpen(updatedIsOpen);
     };
 
     return(
         <ul id="tree-view">
-            <li id="root-tree-view"><span className={`caret ${isOpen ? 'caret-down' : ''}`} onClick={handleToggle}>Network</span>
-                <ul className={`nested ${isOpen ? 'active' : ''}`}>
-                <li><span className={`caret ${isOpen2 ? 'caret-down' : ''}`} onClick={handleToggle2}>Marker</span>
-                    <ul className={`nested ${isOpen2 ? 'active' : ''}`}>
+            <li id="root-tree-view"><span className={`caret ${isOpen[0] ? 'caret-down' : ''}`} onClick={()=>handleToggle(0)}>Network</span>
+                <ul className={`nested ${isOpen[0] ? 'active' : ''}`}>
+                <li><span className={`caret ${isOpen[1] ? 'caret-down' : ''}`} onClick={()=>handleToggle(1)}>Marker</span>
+                    <ul className={`nested ${isOpen[1] ? 'active' : ''}`}>
                     <li id="add-Marker-tv" onClick={props.turnOnIsMarker}>add Marker</li>
                     <li>remove Marker</li>
                     </ul>
                 </li>
 
-                <li><span className={`caret ${isOpen3 ? 'caret-down' : ''}`} onClick={handleToggle3}>Connection</span>
-                    <ul className={`nested ${isOpen3 ? 'active' : ''}`}>
+                <li><span className={`caret ${isOpen[2] ? 'caret-down' : ''}`} onClick={()=>handleToggle(2)}>Connection</span>
+                    <ul className={`nested ${isOpen[2] ? 'active' : ''}`}>
                     <li>add Connection</li>
                     <li>remove Connection</li>
                     </ul>
                 </li>
 
-                <li><span className={`caret ${isOpen4 ? 'caret-down' : ''}`} onClick={handleToggle4}>Nodes</span>
-                    <ul className={`nested ${isOpen4 ? 'active' : ''}`}>
+                <li><span className={`caret ${isOpen[3] ? 'caret-down' : ''}`} onClick={()=>handleToggle(3)}>Nodes</span>
+                    <ul className={`nested ${isOpen[3] ? 'active' : ''}`}>
                     <li>TH1</li>
                     <li>TH2</li>
                     </ul>
