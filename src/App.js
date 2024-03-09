@@ -49,22 +49,20 @@ function App() {
       {
         addNewPoint &&
         <NewPoint onDismiss={turnOffNewPointModal}>
-          <div className="testbox">
-            <form onSubmit={turnOffNewPointModal}>
-              <h2>Enter your point !</h2>
-              <div className="item">
-                <label htmlFor="Latitude">Latitude<span>*</span></label>
-                <input id="Latitude" type="number" step='0.00000000000000001' name="Latitude" required/>
-              </div>
-              <div className="item">
-                <label htmlFor="Longitude">Longitude<span>*</span></label>
-                <input id="Longitude" type="number" step='0.00000000000000001' name="Longitude" required/>
-              </div>
-              <div className="btn-block">
-                <button type="submit" href="/">Submit</button>
-              </div>
-            </form>
-          </div>
+          <form onSubmit={turnOffNewPointModal}>
+            <h2>Enter your point !</h2>
+            <div className="item">
+              <label htmlFor="Latitude">Latitude<span>*</span></label>
+              <input id="Latitude" type="number" step='0.00000000000000001' name="Latitude" required/>
+            </div>
+            <div className="item">
+              <label htmlFor="Longitude">Longitude<span>*</span></label>
+              <input id="Longitude" type="number" step='0.00000000000000001' name="Longitude" required/>
+            </div>
+            <div className="btn-block">
+              <button className='form-btn' type="submit" href="/">Submit</button>
+            </div>
+          </form>
         </NewPoint>
       }
     </div>

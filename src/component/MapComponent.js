@@ -23,8 +23,15 @@ function markersFun(map, point) {
         console.log('Popup opened');
     });
 
-    marker.on('contextmenu', ()=>{
-        console.log("kaslndjksadahbasjk");
+    marker.on('contextmenu', (e)=>{
+        
+        const latlng = marker.getLatLng();
+        console.log('Latitude:', latlng.lat, 'Longitude:', latlng.lng);
+        let x = e.containerPoint.x;
+        let y = e.containerPoint.y;
+        console.log(x);
+        console.log(y);
+        showContextMenuOfMarkers(latlng, marker);
     })
 }
 
@@ -50,6 +57,23 @@ function changeCursorIcon(map, isAddMarker) {
         map.getContainer().style.cursor = '';
     }
 }
+
+function hideContextMenuOfMarkers() {
+    const contextMenu = document.getElementById('contextMenu');
+    contextMenu.style.display = 'none';
+}
+
+function showContextMenuOfMarkers(latlng, marker) {
+    const contextMenu = document.getElementById('contextMenu');
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = latlng.lng + 'px';
+    contextMenu.style.top = latlng.lat + 'px';
+    
+
+    // Handle marker-specific actions here if needed
+    // For example, you can pass the marker reference to identify which marker triggered the context menu
+}
+
 
 const MapComponent = (props)=>{
     const [map, setMap] = useState(null);
@@ -99,11 +123,15 @@ const MapComponent = (props)=>{
 
         map.on('click', (e) => {
             console.log('Map clicked at:', e.latlng);
+            hideContextMenuOfMarkers();
         });
 
         map.on('contextmenu', (e)=>{
             console.log("abbbbbbbas : ", e.type);
+            hideContextMenuOfMarkers();
         })
+
+
 
         
 
@@ -161,7 +189,15 @@ const MapComponent = (props)=>{
       
 
     return(
-        <div id="map"></div>
+        <div id="map">
+             <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
+                <ul>
+                    <li>Option 1</li>
+                    <li>Option 2</li>
+                    {/* Add more options as needed */}
+                </ul>
+            </div>
+        </div>
     );
     
 }
