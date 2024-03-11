@@ -14,6 +14,7 @@ function addNewMarker(map, point) {
 
 function markersFun(map, point) {
     const marker = addNewMarker(map, point);
+    marker.getPane()
 
     marker.on('mouseover', () => {
         marker.openPopup();
@@ -70,10 +71,10 @@ function hideContextMenuOfMarkers() {
 }
 
 function showContextMenuOfMarkers(latlng, marker) {
-    const contextMenu = document.getElementById('contextMenu');
-    contextMenu.style.display = 'block';
-    contextMenu.style.left = latlng.lng + 'px';
-    contextMenu.style.top = latlng.lat + 'px';
+    const contextMenuMarker = document.getElementById('contextMenu');
+    contextMenuMarker.style.display = 'block';
+    contextMenuMarker.style.left = marker._icon._leaflet_pos.x + 'px';
+    contextMenuMarker.style.top = marker._icon._leaflet_pos.y + 'px';
     
 
     // Handle marker-specific actions here if needed
@@ -106,11 +107,16 @@ const MapComponent = (props)=>{
     useEffect(() => {
     
         if(map){
-            setCountInitialized(prevCount => prevCount + 1);
 
-            props.points.map((point) => {
-                markersFun(map, point);
-            });
+            if (countInitialized == 0) {
+                props.points.map((point) => {
+                    markersFun(map, point);
+                });
+            }else{
+                markersFun(map, props.points[props.points.length-1])
+            }
+
+            setCountInitialized(prevCount => prevCount + 1);
     
                         
             // Define coordinates for the polyline
@@ -198,28 +204,30 @@ const MapComponent = (props)=>{
     }, [map, countInitialized]);
 
     useEffect(()=>{
-        if (!map) return;
-        changeCursorIcon(map, props.isAddMarker);
-        if (props.isAddMarker){
-            map.on('click', (e) => {
-                // Create a new point object with clicked coordinates
-                const newPoint = {
-                    Latitude: e.latlng.lat,
-                    Longitude: e.latlng.lng
-                };
-                // Call the addPoint function passed down as prop to add the new point
-                props.addPoint(newPoint);
-            });
-        }
+        if (!map || !props.isAddMarker) return; // Exit early if map is not initialized or isAddMarker is false
+        changeCursorIcon(map, props.isAddMarker)
+        const clickHandler = (e) => {
+            // Create a new point object with clicked coordinates
+            const newPoint = {
+                Latitude: e.latlng.lat,
+                Longitude: e.latlng.lng
+            };
+            // Call the addPoint function passed down as prop to add the new point
+            props.addPoint(newPoint);
+        };
+        map.on('click', clickHandler); // Attach click handler
+        return () => {
+            map.off('click', clickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
+        };
     }, [map, props.isAddMarker, props.addPoint, props]);
       
 
     return(
         <div id="map">
-             <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
-                <ul>
-                    <li>Option 1</li>
-                    <li>Option 2</li>
+            <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
+                <ul className="markerContextMenu">
+                    <li className="markerContextMenuItem">Option 1</li>
+                    <li className="lastMarkerContextMenuItem">Option 2</li>
                     {/* Add more options as needed */}
                 </ul>
             </div>
