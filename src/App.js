@@ -17,11 +17,11 @@ function App() {
   const [addNewPoint, setAddNewPoint] = useState(false);
   const [points, setPoints] = useState(samplePoints);
   const [isAddMarker, setIsAddMarker] = useState(false);
+  
 
 
   const addPoint = (newPoint) => {
-    setPoints([...points, newPoint]);
-    console.log(points);
+    setPoints(prevPoints => [...prevPoints, newPoint]);
   };
 
   useEffect(()=>{

@@ -12,6 +12,10 @@ form, input, textarea, label, p {
     line-height: 22px;
 }
 
+ul{
+    font: menu;
+}
+
 textarea {
     width: calc(100% - 12px);
     padding: 5px;

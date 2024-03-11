@@ -34,6 +34,33 @@
   display: flex;
   justify-content: flex-end;
 }
+
+#contextMenu{
+  z-index: 1000;
+  background: #ddf0af;
+  border-radius: 10px;
+}
+
+.markerContextMenu{
+  padding-inline: 0;
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.markerContextMenuItem{
+  padding-bottom: 3px;
+  border-bottom-color: rgb(91, 181, 0);
+  padding-inline: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-top: 3px;
+
+}
+
+.lastMarkerContextMenuItem{
+  padding-inline: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
   
 @media (max-width: 768px) {
 
