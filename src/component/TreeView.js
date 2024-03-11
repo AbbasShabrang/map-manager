@@ -29,7 +29,7 @@ const TreeView = (props)=>{
 
                 <li><span className={`caret ${isOpen[2] ? 'caret-down' : ''}`} onClick={()=>handleToggle(2)}>Connection</span>
                     <ul className={`nested ${isOpen[2] ? 'active' : ''}`}>
-                    <li>add Connection</li>
+                    <li id="add-Connection-tv" onClick={props.turnOnIsAddConnection}>add Connection</li>
                     <li>remove Connection</li>
                     </ul>
                 </li>
