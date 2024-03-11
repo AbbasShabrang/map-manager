@@ -43,7 +43,6 @@ function App() {
 
   function turnOffNewPointModal() {
     setAddNewPoint(false);
-    console.log("asaddsadasdasdsa");
   }
 
   return (

@@ -60,8 +60,10 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
 function changeCursorIcon(map, isAddMarker) {
     if (isAddMarker) {
         map.getContainer().style.cursor = 'pointer';
+        console.log("mahdi");
     } else {
         map.getContainer().style.cursor = '';
+        console.log("ksjjakdbhaasbhjdsvhjchjxwdsjacjhdabs'm");
     }
 }
 
@@ -204,8 +206,11 @@ const MapComponent = (props)=>{
     }, [map, countInitialized]);
 
     useEffect(()=>{
+        if (map){
+            changeCursorIcon(map, props.isAddMarker)
+        }
+
         if (!map || !props.isAddMarker) return; // Exit early if map is not initialized or isAddMarker is false
-        changeCursorIcon(map, props.isAddMarker)
         const clickHandler = (e) => {
             // Create a new point object with clicked coordinates
             const newPoint = {

@@ -1,6 +1,6 @@
-import React, {useEffect, useState, useContext} from "react";
+import React, {useState} from "react";
 import './TreeView.css';
-import StateContext from '../store/state-contex';
+// import StateContext from '../store/state-contex';
 
 const isOpenList = [true, false, false, false]
 
@@ -8,7 +8,7 @@ const TreeView = (props)=>{
     const [isOpen, setIsOpen] = useState(isOpenList);
 
 
-    const ctx = useContext(StateContext);
+    // const ctx = useContext(StateContext);
 
     const handleToggle = (index) => {
         const updatedIsOpen = [...isOpen];
