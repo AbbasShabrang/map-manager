@@ -42,18 +42,25 @@ function markersFun(map, point) {                                       //ok
     })
 }
 
-function calculateArcPoints(map, latlng1, latlng2, curvature) {                     //ok
+function calculateArcPoints(map, latlng1, latlng2, curvature) {
+    if (!map || !latlng1 || !latlng2) {
+        return []; // Return empty array if map or coordinates are not valid
+    }
+
     var pointCount = 100; // Number of points in the arc
     var points = [];
-    var latlngs = [latlng1, latlng2];
+    var latlngs = [L.latLng(latlng1), L.latLng(latlng2)]; // Convert arrays to LatLng objects
+    var distance = latlngs[0].distanceTo(latlngs[1]); // Calculate distance between points
+
     for (var i = 0; i <= pointCount; i++) {
         var t = i / pointCount;
         var point = L.GeometryUtil.interpolateOnLine(map, latlngs, t);
-        var angle = L.GeometryUtil.bearing(latlng1, latlng2) - 90;
-        var distance = latlng1.distanceTo(latlng2) * curvature * Math.sin(Math.PI * t);
-        var offset = L.GeometryUtil.destination(point.latLng, angle, distance);
+        var angle = L.GeometryUtil.bearing(latlngs[0], latlngs[1]) - 90;
+        var offsetDistance = distance * curvature * Math.sin(Math.PI * t); // Calculate offset distance
+        var offset = L.GeometryUtil.destination(point.latLng, angle, offsetDistance);
         points.push(offset);
     }
+
     return points;
 }
 
@@ -82,6 +89,19 @@ function showContextMenuOfMarkers(latlng, marker) {                             
     contextMenuMarker.style.top = marker._icon._leaflet_pos.y + 'px';
     // Handle marker-specific actions here if needed
     // For example, you can pass the marker reference to identify which marker triggered the context menu
+}
+
+function drawConnection(map, marker1, marker2, color, stroke, weight, curvature_factor) {
+    if (!map || !marker1 || !marker2) {
+        return; // Exit early if map or markers are not valid
+    }
+
+    // Define coordinates for the polyline
+    var arcPoints = calculateArcPoints(map, [marker1.Latitude, marker1.Longitude], [marker2.Latitude, marker2.Longitude], curvature_factor); // 0.5 is the curvature factor, adjust as needed
+    // var latlngs = [markerList[0].getLatLng(), markerList[1].getLatLng()];
+
+    // Create a polyline
+    var polyline = L.polyline(arcPoints, {color: color, stroke: stroke, weight: weight}).addTo(map);
 }
 
 
@@ -115,23 +135,16 @@ const MapComponent = (props)=>{
                 props.points.map((point) => {
                     markersFun(map, point);
                 });
+                props.connections.map((connection) => {
+                    drawConnection(map, connection.marker1, connection.marker2, connection.status, true, 5, connection.degree)
+                })
             }else{
                 markersFun(map, props.points[props.points.length-1])
             }
 
             setCountInitialized(prevCount => prevCount + 1);
     
-                        
-            // Define coordinates for the polyline
-            var arcPoints = calculateArcPoints(map, markerList[0].getLatLng(), markerList[1].getLatLng(), 0.5); // 0.5 is the curvature factor, adjust as needed
-            var arcPoints2 = calculateArcPoints(map, markerList[0].getLatLng(), markerList[1].getLatLng(), 0); // 0.5 is the curvature factor, adjust as need
-            // var latlngs = [markerList[0].getLatLng(), markerList[1].getLatLng()];
-    
-            // Create a polyline
-            var polyline = L.polyline(arcPoints, {color: 'red', stroke: true, weight: 5}).addTo(map);
-            var polyline2 = L.polyline(arcPoints2, {color: 'blue', stroke: true, weight: 5}).addTo(map);
-            console.log("tesssssssssssssst");
-    
+
             // console.log(map.getCenter()); 
             
             // console.log(map.getBounds()); 
@@ -177,8 +190,11 @@ const MapComponent = (props)=>{
 
     useEffect(()=>{
         console.log(props.connections);
+        const connection = props.connections[props.connections.length-1]
+        drawConnection(map, connection.marker1, connection.marker2, connection.status, true, 5, connection.degree)
+
 //todo
-    }, [props.connections])
+    }, [map, props.connections])
 
 
     useEffect(()=>{
@@ -220,9 +236,9 @@ const MapComponent = (props)=>{
             };
         } else if(!props.isAddMarker && props.isAddConnection){
             console.log("teeeeeeeeeeeeeeeeeesttttttttttt2");
-            map.on('click', isAddConnectionClickHandler); // Attach click handler
+            map.on('click', isAddConnectionClickHandler);
             return () => {
-                map.off('click', isAddConnectionClickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
+                map.off('click', isAddConnectionClickHandler);
             };
         }
 
