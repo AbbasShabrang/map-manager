@@ -65,7 +65,7 @@ function App() {
     <div className="App">
       <TreeView turnOnIsMarker={turnOnIsMarker} turnOnIsAddConnection={turnOnIsAddConnection}></TreeView>
       <DataView></DataView>
-      <MapComponent points={points} addPoint={addPoint} isAddMarker={isAddMarker}></MapComponent>
+      <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection} isAddMarker={isAddMarker} isAddConnection={isAddConnection}></MapComponent>
       <AddBtn AddBtn={addBtnHandler}/>
       {
         addNewPoint &&

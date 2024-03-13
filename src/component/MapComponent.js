@@ -4,7 +4,7 @@ import 'leaflet-geometryutil';
 
 const markerList = [];
 
-function addNewMarker(map, point) {
+function addNewMarker(map, point) {                                     //ok
     const marker = L.marker([point.Latitude, point.Longitude]).addTo(map)
           .bindPopup(point.Latitude + " , "+ point.Longitude);
 
@@ -12,7 +12,7 @@ function addNewMarker(map, point) {
     return marker
 }
 
-function markersFun(map, point) {
+function markersFun(map, point) {                                       //ok
     const marker = addNewMarker(map, point);
     marker.getPane()
 
@@ -42,7 +42,7 @@ function markersFun(map, point) {
     })
 }
 
-function calculateArcPoints(map, latlng1, latlng2, curvature) {
+function calculateArcPoints(map, latlng1, latlng2, curvature) {                     //ok
     var pointCount = 100; // Number of points in the arc
     var points = [];
     var latlngs = [latlng1, latlng2];
@@ -57,28 +57,29 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
     return points;
 }
 
-function changeCursorIcon(map, isAddMarker) {
-    if (isAddMarker) {
+function changeCursorIcon(map, isAddMarker, isAddConnection) {                       //ok
+    if (isAddMarker && isAddConnection){
+        map.getContainer().style.cursor = 'not-allowed'
+        alert('you can\'t do more than one task!!!')
+    } else if (isAddMarker) {
         map.getContainer().style.cursor = 'pointer';
-        console.log("mahdi");
+    } else if(isAddConnection){
+        map.getContainer().style.cursor = 'copy';
     } else {
         map.getContainer().style.cursor = '';
-        console.log("ksjjakdbhaasbhjdsvhjchjxwdsjacjhdabs'm");
     }
 }
 
-function hideContextMenuOfMarkers() {
+function hideContextMenuOfMarkers() {                                                   //ok
     const contextMenu = document.getElementById('contextMenu');
     contextMenu.style.display = 'none';
 }
 
-function showContextMenuOfMarkers(latlng, marker) {
+function showContextMenuOfMarkers(latlng, marker) {                                     //ok
     const contextMenuMarker = document.getElementById('contextMenu');
     contextMenuMarker.style.display = 'block';
     contextMenuMarker.style.left = marker._icon._leaflet_pos.x + 'px';
     contextMenuMarker.style.top = marker._icon._leaflet_pos.y + 'px';
-    
-
     // Handle marker-specific actions here if needed
     // For example, you can pass the marker reference to identify which marker triggered the context menu
 }
@@ -89,7 +90,7 @@ const MapComponent = (props)=>{
     const [isMapInitialized, setIsMapInitialized] = useState(false);
     const [countInitialized, setCountInitialized] = useState(0);
 
-    useEffect(() => {
+    useEffect(() => {                                                                   //ok
         if (!isMapInitialized) {
             const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 7);
     
@@ -110,7 +111,7 @@ const MapComponent = (props)=>{
     
         if(map){
 
-            if (countInitialized == 0) {
+            if (countInitialized === 0) {
                 props.points.map((point) => {
                     markersFun(map, point);
                 });
@@ -129,15 +130,7 @@ const MapComponent = (props)=>{
             // Create a polyline
             var polyline = L.polyline(arcPoints, {color: 'red', stroke: true, weight: 5}).addTo(map);
             var polyline2 = L.polyline(arcPoints2, {color: 'blue', stroke: true, weight: 5}).addTo(map);
-    
-            // polyline.addEventListener('mouseover', ()=>{
-            //     arcPoints.map((x)=>{
-            //         console.log(x);
-            //     })
-            // });
-    
-            // const secondMarker = L.marker([props.points[1].Latitude+1, props.points[1].Longitude]).addTo(map);
-            // map.addLayer(secondMarker);
+            console.log("tesssssssssssssst");
     
             // console.log(map.getCenter()); 
             
@@ -156,32 +149,8 @@ const MapComponent = (props)=>{
             //     map.flyTo([props.latitude, props.longitude], 9, customAnimationOptions);
             // }, 1000);
     
-    
-    
-            // setTimeout(() => {
-            //     // Add a marker for the user's location
-            //     let marker = null;
-    
-            //     // Locate the user's position
-            //     map.locate({ setView: true, watch: true }) // enable continuous location updates
-            //     .on('locationfound', (e) => {
-            //         // If marker is already on the map, remove it
-            //         if (marker) {
-            //         map.removeLayer(marker);
-            //         }
-    
-            //         marker = L.marker(e.latlng).addTo(map);
-            //         marker.bindPopup('You are here!').openPopup();
-            //     })
-            //     .on('locationerror', (e) => {
-            //         alert("Location access denied.");
-            //     });
-            // }, 1000);
-    
         }
         
-        
-
       }, [props.points, map]);
 
     useEffect(() => {
@@ -205,13 +174,15 @@ const MapComponent = (props)=>{
         }
     }, [map, countInitialized]);
 
-    useEffect(()=>{
-        if (map){
-            changeCursorIcon(map, props.isAddMarker)
-        }
 
-        if (!map || !props.isAddMarker) return; // Exit early if map is not initialized or isAddMarker is false
-        const clickHandler = (e) => {
+    useEffect(()=>{
+        console.log(props.connections);
+//todo
+    }, [props.connections])
+
+
+    useEffect(()=>{
+        const isAddMarkerClickHandler = (e) => {
             // Create a new point object with clicked coordinates
             const newPoint = {
                 Latitude: e.latlng.lat,
@@ -220,11 +191,42 @@ const MapComponent = (props)=>{
             // Call the addPoint function passed down as prop to add the new point
             props.addPoint(newPoint);
         };
-        map.on('click', clickHandler); // Attach click handler
-        return () => {
-            map.off('click', clickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
+        
+        const isAddConnectionClickHandler = (e) => {
+            const newConnection = {
+                marker1: {Latitude: 34.23546050156551, Longitude: 50.46163671486197}, 
+                marker2: {Latitude: 34.23546050156551, Longitude: 49.46163671486197},
+                degree: '0.3',
+                status: 'green'
+            }
+            props.addConnection(newConnection)
         };
-    }, [map, props.isAddMarker, props.addPoint, props]);
+
+
+
+        if (map){
+            changeCursorIcon(map, props.isAddMarker, props.isAddConnection)
+        }
+
+        if (!map) return; // Exit early if map is not initialized or isAddMarker is false
+        
+        if(!props.isAddMarker && !props.isAddConnection) return;
+        
+
+        if (props.isAddMarker && !props.isAddConnection) {
+            map.on('click', isAddMarkerClickHandler); // Attach click handler
+            return () => {
+                map.off('click', isAddMarkerClickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
+            };
+        } else if(!props.isAddMarker && props.isAddConnection){
+            console.log("teeeeeeeeeeeeeeeeeesttttttttttt2");
+            map.on('click', isAddConnectionClickHandler); // Attach click handler
+            return () => {
+                map.off('click', isAddConnectionClickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
+            };
+        }
+
+    }, [map, props.isAddMarker, props.addPoint, props.isAddConnection]);
       
 
     return(
