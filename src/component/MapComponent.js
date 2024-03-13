@@ -34,23 +34,22 @@ function markersFun(map, point) {                                       //ok
         },200);
     });
 
-    marker.on('popupopen', () => {
-        console.log('Popup opened');
-    });
+    // marker.on('popupopen', () => {
+    //     console.log('Popup opened');
+    // });
 
     marker.on('contextmenu', (e)=>{
         const latlng = marker.getLatLng();
         console.log('Latitude:', latlng.lat, 'Longitude:', latlng.lng);
-        let x = e.containerPoint.x;
-        let y = e.containerPoint.y;
-        console.log(x);
-        console.log(y);
+        // let x = e.containerPoint.x;
+        // let y = e.containerPoint.y;
+        // console.log(x);
+        // console.log(y);
         showContextMenuOfMarkers(latlng, marker);
     })
     
     marker.on('click', ()=>{
         console.log("offffffff");
-        // console.log("ashhdfhgasfyhfv"+marker.getLatLng());
     })
     
 }
@@ -125,6 +124,20 @@ function changeOnClickOfAddConnection(points, isAddConnection){
             marker.off('click');
             marker.on('click', ()=>{
                 console.log("ashhdfhgasfyhfv"+marker.getLatLng());
+                if (firstMarkerSelected == null) {
+                    firstMarkerSelected = marker
+
+                }else if(secondMarkerSelected == null){
+                    secondMarkerSelected = marker
+                    if(secondMarkerSelected === firstMarkerSelected){
+                        secondMarkerSelected = null
+                    }
+                }
+
+                if (firstMarkerSelected != null && secondMarkerSelected != null) {
+                    console.log("let's goooooooooooooooooo");
+                    
+                }
             })
         })
     }else{
@@ -173,11 +186,7 @@ const MapComponent = (props)=>{
     useEffect(() => {
     
         if(map){
-            const connectionStablished = props.isAddConnection
-            console.log("isAddConnection : "+connectionStablished);
             if (countInitialized === 0) {
-                console.log("isAddConnection2 : "+connectionStablished);
-
                 props.points.map((point) => {
                     markersFun(map, point);
                 });
@@ -285,7 +294,6 @@ const MapComponent = (props)=>{
                 map.off('click', isAddMarkerClickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
             };
         } else if(!props.isAddMarker && props.isAddConnection){
-            console.log("teeeeeeeeeeeeeeeeeesttttttttttt2");
             map.on('click', isAddConnectionClickHandler);
             return () => {
                 map.off('click', isAddConnectionClickHandler);
