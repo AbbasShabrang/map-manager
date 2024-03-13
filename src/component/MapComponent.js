@@ -3,6 +3,8 @@ import L from 'leaflet';
 import 'leaflet-geometryutil';
 
 const markerList = [];
+let firstMarkerSelected = null;
+let secondMarkerSelected = null;
 
 function addNewMarker(map, point) {                                     //ok
     const marker = L.marker([point.Latitude, point.Longitude]).addTo(map)
@@ -12,8 +14,14 @@ function addNewMarker(map, point) {                                     //ok
     return marker
 }
 
+function makeMarkersNull(){
+    firstMarkerSelected = null;
+    secondMarkerSelected = null;
+}
+
 function markersFun(map, point) {                                       //ok
     const marker = addNewMarker(map, point);
+    // console.log(markerList);
     marker.getPane()
 
     marker.on('mouseover', () => {
@@ -31,7 +39,6 @@ function markersFun(map, point) {                                       //ok
     });
 
     marker.on('contextmenu', (e)=>{
-        
         const latlng = marker.getLatLng();
         console.log('Latitude:', latlng.lat, 'Longitude:', latlng.lng);
         let x = e.containerPoint.x;
@@ -40,6 +47,12 @@ function markersFun(map, point) {                                       //ok
         console.log(y);
         showContextMenuOfMarkers(latlng, marker);
     })
+    
+    marker.on('click', ()=>{
+        console.log("offffffff");
+        // console.log("ashhdfhgasfyhfv"+marker.getLatLng());
+    })
+    
 }
 
 function calculateArcPoints(map, latlng1, latlng2, curvature) {
@@ -104,6 +117,36 @@ function drawConnection(map, marker1, marker2, color, stroke, weight, curvature_
     var polyline = L.polyline(arcPoints, {color: color, stroke: stroke, weight: weight}).addTo(map);
 }
 
+function changeOnClickOfAddConnection(points, isAddConnection){
+    if (isAddConnection) {
+        points.map((point)=>{
+            const marker = getMarkerByLatLng(L.latLng(point.Latitude, point.Longitude))
+            
+            marker.off('click');
+            marker.on('click', ()=>{
+                console.log("ashhdfhgasfyhfv"+marker.getLatLng());
+            })
+        })
+    }else{
+        points.map((point)=>{
+            const marker = getMarkerByLatLng(L.latLng(point.Latitude, point.Longitude))
+            marker.off('click');
+            marker.on('click', ()=>{
+                console.log("you clicked on a marker");
+            })
+        })
+    }
+}
+
+function getMarkerByLatLng(latlng) {
+    for (let i = 0; i < markerList.length; i++) {
+      const marker = markerList[i];
+      if (marker.getLatLng().equals(latlng)) {
+        return marker; // Return the marker if its LatLng matches the target LatLng
+      }
+    }
+    return null; // Return null if no marker with the specified LatLng is found
+  }
 
 const MapComponent = (props)=>{
     const [map, setMap] = useState(null);
@@ -130,8 +173,11 @@ const MapComponent = (props)=>{
     useEffect(() => {
     
         if(map){
-
+            const connectionStablished = props.isAddConnection
+            console.log("isAddConnection : "+connectionStablished);
             if (countInitialized === 0) {
+                console.log("isAddConnection2 : "+connectionStablished);
+
                 props.points.map((point) => {
                     markersFun(map, point);
                 });
@@ -140,6 +186,10 @@ const MapComponent = (props)=>{
                 })
             }else{
                 markersFun(map, props.points[props.points.length-1])
+
+                changeOnClickOfAddConnection(props.points, props.isAddConnection)
+
+                
             }
 
             setCountInitialized(prevCount => prevCount + 1);
@@ -164,7 +214,7 @@ const MapComponent = (props)=>{
     
         }
         
-      }, [props.points, map]);
+      }, [props.points, map, props.isAddConnection]);
 
     useEffect(() => {
         if (map && countInitialized === 0) {
