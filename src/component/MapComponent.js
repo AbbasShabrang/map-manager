@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import L from 'leaflet';
+import L, { map } from 'leaflet';
 import 'leaflet-geometryutil';
 
 const markerList = [];
@@ -103,52 +103,53 @@ function showContextMenuOfMarkers(latlng, marker) {                             
     // For example, you can pass the marker reference to identify which marker triggered the context menu
 }
 
-function drawConnection(map, marker1, marker2, color, stroke, weight, curvature_factor) {
-    if (!map || !marker1 || !marker2) {
+function drawConnection(map, marker1_Latitude, marker1_Longitude, marker2_Latitude, marker2_Longitude, color, stroke, weight, curvature_factor) {
+    if (!map || !marker1_Latitude || !marker2_Latitude) {
         return; // Exit early if map or markers are not valid
     }
 
     // Define coordinates for the polyline
-    var arcPoints = calculateArcPoints(map, [marker1.Latitude, marker1.Longitude], [marker2.Latitude, marker2.Longitude], curvature_factor); // 0.5 is the curvature factor, adjust as needed
+    var arcPoints = calculateArcPoints(map, [marker1_Latitude, marker1_Longitude], [marker2_Latitude, marker2_Longitude], curvature_factor); // 0.5 is the curvature factor, adjust as needed
     // var latlngs = [markerList[0].getLatLng(), markerList[1].getLatLng()];
 
     // Create a polyline
     var polyline = L.polyline(arcPoints, {color: color, stroke: stroke, weight: weight}).addTo(map);
 }
 
-function changeOnClickOfAddConnection(points, isAddConnection){
-    if (isAddConnection) {
-        points.map((point)=>{
-            const marker = getMarkerByLatLng(L.latLng(point.Latitude, point.Longitude))
-            
+function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
+    markerList.map((marker)=>{
+        if (isAddConnection) {
             marker.off('click');
             marker.on('click', ()=>{
-                console.log("ashhdfhgasfyhfv"+marker.getLatLng());
+                console.log(marker);
+
                 if (firstMarkerSelected == null) {
                     firstMarkerSelected = marker
-
                 }else if(secondMarkerSelected == null){
                     secondMarkerSelected = marker
                     if(secondMarkerSelected === firstMarkerSelected){
                         secondMarkerSelected = null
                     }
                 }
-
                 if (firstMarkerSelected != null && secondMarkerSelected != null) {
                     console.log("let's goooooooooooooooooo");
-                    
+                    const newConnection = {marker1: firstMarkerSelected, marker2: secondMarkerSelected , degree: '0.4', status: 'yellow'}
+                    addConnection(newConnection);
+                    // console.log(newConnection.marker1);
+                    drawConnection(map, newConnection.marker1._latlng.lat, newConnection.marker1._latlng.lng,
+                         newConnection.marker2._latlng.lat, newConnection.marker2._latlng.lng,
+                         newConnection.status, true, 5, newConnection.degree)
                 }
             })
-        })
-    }else{
-        points.map((point)=>{
-            const marker = getMarkerByLatLng(L.latLng(point.Latitude, point.Longitude))
+            
+        }else{
             marker.off('click');
             marker.on('click', ()=>{
                 console.log("you clicked on a marker");
             })
-        })
-    }
+        }
+    })
+    
 }
 
 function getMarkerByLatLng(latlng) {
@@ -164,7 +165,7 @@ function getMarkerByLatLng(latlng) {
 const MapComponent = (props)=>{
     const [map, setMap] = useState(null);
     const [isMapInitialized, setIsMapInitialized] = useState(false);
-    const [countInitialized, setCountInitialized] = useState(0);
+    const [firstInitialized, setFirstInitialized] = useState(false);
 
     useEffect(() => {                                                                   //ok
         if (!isMapInitialized) {
@@ -186,22 +187,24 @@ const MapComponent = (props)=>{
     useEffect(() => {
     
         if(map){
-            if (countInitialized === 0) {
+            if (!firstInitialized) {
                 props.points.map((point) => {
                     markersFun(map, point);
                 });
                 props.connections.map((connection) => {
-                    drawConnection(map, connection.marker1, connection.marker2, connection.status, true, 5, connection.degree)
+                    drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
+                        connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
                 })
+            setFirstInitialized(true);
+
             }else{
                 markersFun(map, props.points[props.points.length-1])
 
-                changeOnClickOfAddConnection(props.points, props.isAddConnection)
+                changeOnClickOfAddConnection(map, props.isAddConnection, props.addConnection)
 
                 
             }
 
-            setCountInitialized(prevCount => prevCount + 1);
     
 
             // console.log(map.getCenter()); 
@@ -226,8 +229,8 @@ const MapComponent = (props)=>{
       }, [props.points, map, props.isAddConnection]);
 
     useEffect(() => {
-        if (map && countInitialized === 0) {
-            setCountInitialized(1); // Update countInitialized to prevent infinite loop
+        if (map && !firstInitialized) {
+            setFirstInitialized(true);
             L.control.scale().addTo(map);
 
             map.on('dragend', () => {
@@ -244,13 +247,14 @@ const MapComponent = (props)=>{
                 hideContextMenuOfMarkers();
             });
         }
-    }, [map, countInitialized]);
+    }, [map, firstInitialized]);
 
 
     useEffect(()=>{
         console.log(props.connections);
         const connection = props.connections[props.connections.length-1]
-        drawConnection(map, connection.marker1, connection.marker2, connection.status, true, 5, connection.degree)
+        drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
+            connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
 
 //todo
     }, [map, props.connections])
