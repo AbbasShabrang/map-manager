@@ -139,6 +139,7 @@ function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
                     drawConnection(map, newConnection.marker1._latlng.lat, newConnection.marker1._latlng.lng,
                          newConnection.marker2._latlng.lat, newConnection.marker2._latlng.lng,
                          newConnection.status, true, 5, newConnection.degree)
+                    makeMarkersNull();
                 }
             })
             
@@ -152,15 +153,15 @@ function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
     
 }
 
-function getMarkerByLatLng(latlng) {
-    for (let i = 0; i < markerList.length; i++) {
-      const marker = markerList[i];
-      if (marker.getLatLng().equals(latlng)) {
-        return marker; // Return the marker if its LatLng matches the target LatLng
-      }
-    }
-    return null; // Return null if no marker with the specified LatLng is found
-  }
+// function getMarkerByLatLng(latlng) {
+//     for (let i = 0; i < markerList.length; i++) {
+//       const marker = markerList[i];
+//       if (marker.getLatLng().equals(latlng)) {
+//         return marker; // Return the marker if its LatLng matches the target LatLng
+//       }
+//     }
+//     return null; // Return null if no marker with the specified LatLng is found
+// }
 
 const MapComponent = (props)=>{
     const [map, setMap] = useState(null);
