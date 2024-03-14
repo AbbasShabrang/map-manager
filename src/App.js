@@ -6,6 +6,7 @@ import NewPoint from './component/NewPoint.js';
 import './component/form.css'
 import TreeView from './component/TreeView.js';
 import DataView from './component/DataView.js';
+import MapBtn from './component/MapBtn.js';
 
 let samplePoints = [
   {Latitude: 35.73546050156551, Longitude: 51.16163671486197},
@@ -24,6 +25,9 @@ function App() {
   const [connections , setConnections] = useState(sampleConnections)
   const [isAddMarker, setIsAddMarker] = useState(false);
   const [isAddConnection, setIsAddConnection] = useState(false);
+  const [mapType, setMapType] = useState('simple')
+
+  //new point
   
 
 
@@ -43,6 +47,18 @@ function App() {
       document.getElementById('add-Marker-tv').classList.add('make-tv-active');
     }
   }
+
+  function changeMap(){
+    if (mapType === 'simple') {
+      setMapType('sattelite')
+    }else{
+      setMapType('simple')
+    }
+  }
+
+  useEffect(()=>{
+    console.log(mapType);
+  }, [mapType])
 
   function turnOnIsAddConnection(){
     setIsAddConnection(!isAddConnection);
@@ -65,7 +81,12 @@ function App() {
     <div className="App">
       <TreeView turnOnIsMarker={turnOnIsMarker} turnOnIsAddConnection={turnOnIsAddConnection}></TreeView>
       <DataView></DataView>
-      <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection} isAddMarker={isAddMarker} isAddConnection={isAddConnection}></MapComponent>
+      
+      <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
+       isAddMarker={isAddMarker} isAddConnection={isAddConnection} mapType={mapType} ></MapComponent>
+
+      <MapBtn changeMap={changeMap}/>
+
       <AddBtn AddBtn={addBtnHandler}/>
       {
         addNewPoint &&

@@ -1,0 +1,30 @@
+.map-btn {
+    background-color: #c2fbd7;
+    border-radius: 50%;
+    color: rgb(42, 229, 42);
+    cursor: pointer;
+    display: inline-block;
+    font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
+    text-align: center;
+    text-decoration: none;
+    transition: all 250ms;
+    border: dashed 2px black;
+    font-size: 16px;
+    font-weight: bold;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    height: 40px;
+    width: 40px;
+    z-index: 10;
+    background: url(../../public/sattelite-icon.png) no-repeat center center rgba(255, 238, 217, 0.495);
+    padding: 22px;
+
+    position: absolute;
+    top: 80px;
+    right: 1%;
+  }
+  
+.map-btn:hover {
+    transform: scale(1.05);
+}

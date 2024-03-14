@@ -167,24 +167,46 @@ const MapComponent = (props)=>{
     const [map, setMap] = useState(null);
     const [isMapInitialized, setIsMapInitialized] = useState(false);
     const [firstInitialized, setFirstInitialized] = useState(false);
+    const [mapAddress, setMapAddress] = useState('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png')
 
     useEffect(() => {                                                                   //ok
         if (!isMapInitialized) {
             const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 7);
+            setMap(map);
+            setIsMapInitialized(true);
+        }
+        
+    }, [props.points, isMapInitialized]);
+
+    useEffect(() => {                                                                   //ok
+        if (props.mapType === 'simple') {
+            setMapAddress('./IRAN/SATTELITE/{z}/{x}/{y}.jpg');
+            console.log("not simmmmmmmmmmmmple");
+        } else {
+            setMapAddress('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png');
+            console.log("simmmmmmmmmmmmple");
+        }
+        
+    }, [props.mapType]);
+
+    useEffect(() => {
+        if (map) {
+            map.eachLayer(layer => {
+                if (layer instanceof L.TileLayer) {
+                    map.removeLayer(layer); // Remove existing layers
+                }
+            });
     
-            L.tileLayer('./IRAN/{z}/{x}/{y}.png', {
+            L.tileLayer(mapAddress, {
                 tms: true,
                 maxZoom: 10,
                 minZoom: 1,
                 tileSize: 512,
                 zoomOffset: -1
             }).addTo(map);
-    
-            setMap(map);
-            setIsMapInitialized(true);
         }
-    }, [props.points, isMapInitialized]);
-
+    }, [map, mapAddress]);
+    
     useEffect(() => {
     
         if(map){
