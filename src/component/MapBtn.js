@@ -5,7 +5,7 @@ const MapBtn = (props)=>{
       
 
     return(
-        <button className='map-btn' onClick={props.changeMap}></button>
+        <button id='map-btn' onClick={props.changeMap}></button>
     );
     
 }

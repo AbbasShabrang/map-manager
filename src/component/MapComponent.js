@@ -178,13 +178,22 @@ const MapComponent = (props)=>{
         
     }, [props.points, isMapInitialized]);
 
-    useEffect(() => {                                                                   //ok
-        if (props.mapType === 'simple') {
-            setMapAddress('./IRAN/SATTELITE/{z}/{x}/{y}.jpg');
-            console.log("not simmmmmmmmmmmmple");
-        } else {
-            setMapAddress('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png');
-            console.log("simmmmmmmmmmmmple");
+    useEffect(() => {       
+        const contextMenu = document.getElementById('map-btn');
+        if (contextMenu) {
+            if (props.mapType === 'sattelite') {
+                contextMenu.style.background =  "url('/simple-map-icon.png') no-repeat center center rgba(255, 238, 217, 0.495)";
+
+                setMapAddress('./IRAN/SATTELITE/{z}/{x}/{y}.jpg');
+                console.log("not simmmmmmmmmmmmple");
+            } else {
+                contextMenu.style.background =  "url('/sattelite-icon.png') no-repeat center center rgba(255, 238, 217, 0.495)";
+
+                setMapAddress('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png');
+                console.log("simmmmmmmmmmmmple");
+            }
+        }else {
+            console.log("Element with ID 'map-btn' not found.");
         }
         
     }, [props.mapType]);
