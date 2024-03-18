@@ -83,7 +83,7 @@ function App() {
       <DataView></DataView>
       
       <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
-       isAddMarker={isAddMarker} isAddConnection={isAddConnection} mapType={mapType} ></MapComponent>
+       isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} mapType={mapType} ></MapComponent>
 
       <MapBtn changeMap={changeMap}/>
 

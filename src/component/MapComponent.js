@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import L, { map } from 'leaflet';
+import L, { map, marker } from 'leaflet';
 import 'leaflet-geometryutil';
 
 const markerList = [];
@@ -19,40 +19,7 @@ function makeMarkersNull(){
     secondMarkerSelected = null;
 }
 
-function markersFun(map, point) {                                       //ok
-    const marker = addNewMarker(map, point);
-    // console.log(markerList);
-    marker.getPane()
 
-    marker.on('mouseover', () => {
-        marker.openPopup();
-    });
-    
-    marker.on('mouseout', () => {
-        setTimeout(()=>{
-            marker.closePopup()
-        },200);
-    });
-
-    // marker.on('popupopen', () => {
-    //     console.log('Popup opened');
-    // });
-
-    marker.on('contextmenu', (e)=>{
-        const latlng = marker.getLatLng();
-        console.log('Latitude:', latlng.lat, 'Longitude:', latlng.lng);
-        // let x = e.containerPoint.x;
-        // let y = e.containerPoint.y;
-        // console.log(x);
-        // console.log(y);
-        showContextMenuOfMarkers(latlng, marker);
-    })
-    
-    marker.on('click', ()=>{
-        console.log("offffffff");
-    })
-    
-}
 
 function calculateArcPoints(map, latlng1, latlng2, curvature) {
     if (!map || !latlng1 || !latlng2) {
@@ -76,6 +43,21 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
     return points;
 }
 
+function removeMarker(map, marker) {
+    console.log(marker);
+    if (marker != null) {
+        console.log("test")
+        map.removeLayer(marker);
+        
+        const index = markerList.indexOf(marker);
+        if (index !== -1) {
+            markerList.splice(index, 1);
+        }
+
+    }
+}
+
+
 function changeCursorIcon(map, isAddMarker, isAddConnection) {                       //ok
     if (isAddMarker && isAddConnection){
         map.getContainer().style.cursor = 'not-allowed'
@@ -94,7 +76,7 @@ function hideContextMenuOfMarkers() {                                           
     contextMenu.style.display = 'none';
 }
 
-function showContextMenuOfMarkers(latlng, marker) {                                     //ok
+function showContextMenuOfMarkers(marker) {                                     //ok
     const contextMenuMarker = document.getElementById('contextMenu');
     contextMenuMarker.style.display = 'block';
     contextMenuMarker.style.left = marker._icon._leaflet_pos.x + 'px';
@@ -165,9 +147,47 @@ function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
 
 const MapComponent = (props)=>{
     const [map, setMap] = useState(null);
+    const [selectedMarker, setSelectedMarker] = useState(null);
     const [isMapInitialized, setIsMapInitialized] = useState(false);
     const [firstInitialized, setFirstInitialized] = useState(false);
     const [mapAddress, setMapAddress] = useState('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png')
+
+
+    function markersFun(map, point) {                                       //ok
+        const marker = addNewMarker(map, point);
+        // console.log(markerList);
+        marker.getPane()
+    
+        marker.on('mouseover', () => {
+            marker.openPopup();
+        });
+        
+        marker.on('mouseout', () => {
+            setTimeout(()=>{
+                marker.closePopup()
+            },200);
+        });
+    
+        // marker.on('popupopen', () => {
+        //     console.log('Popup opened');
+        // });
+    
+        marker.on('contextmenu', (e)=>{
+            const latlng = marker.getLatLng();
+            console.log('Latitude:', latlng.lat, 'Longitude:', latlng.lng);
+            // let x = e.containerPoint.x;
+            // let y = e.containerPoint.y;
+            // console.log(x);
+            // console.log(y);
+            showContextMenuOfMarkers(marker);
+            setSelectedMarker(marker);
+        })
+        
+        marker.on('click', ()=>{
+            console.log("offffffff");
+        })
+        
+    }
 
     useEffect(() => {                                                                   //ok
         if (!isMapInitialized) {
@@ -221,7 +241,7 @@ const MapComponent = (props)=>{
         if(map){
             if (!firstInitialized) {
                 props.points.map((point) => {
-                    markersFun(map, point);
+                    markersFun(map, point)
                 });
                 props.connections.map((connection) => {
                     drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
@@ -343,7 +363,7 @@ const MapComponent = (props)=>{
         <div id="map">
             <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
                 <ul className="markerContextMenu">
-                    <li className="markerContextMenuItem">Option 1</li>
+                    <li className="markerContextMenuItem" onClick={()=>removeMarker(map, selectedMarker)}>remove marker</li>
                     <li className="lastMarkerContextMenuItem">Option 2</li>
                     {/* Add more options as needed */}
                 </ul>
