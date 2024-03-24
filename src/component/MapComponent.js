@@ -43,18 +43,41 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
     return points;
 }
 
-function removeMarker(map, marker) {
-    console.log(marker);
+function removeMarker(map, marker, connections, removeConnection) {
     if (marker != null) {
-        console.log("test")
         map.removeLayer(marker);
         
         const index = markerList.indexOf(marker);
         if (index !== -1) {
             markerList.splice(index, 1);
         }
-
     }
+
+    removeConnectionsRelatedToRemovedMarker(map, marker, connections, removeConnection)
+}
+
+function removeConnectionsRelatedToRemovedMarker(map, marker, connections, removeConnection) {
+
+    connections.map((connection) => {
+        console.log("hi");
+        if (marker._latlng.lat === connection.marker1.Latitude) {
+            if (marker._latlng.lng === connection.marker1.Longitude) {
+                map.removeLayer(connection)
+                removeConnection()
+                console.log("11111111111");
+            }
+        }
+        else if(marker._latlng.lat === connection.marker2.Latitude){
+            if (marker._latlng.lng === connection.marker2.Longitude) {
+                map.removeLayer(connection)
+                removeConnection()
+                console.log("222222222222");
+            }
+        }
+
+    })
+
+    
 }
 
 
@@ -96,6 +119,11 @@ function drawConnection(map, marker1_Latitude, marker1_Longitude, marker2_Latitu
 
     // Create a polyline
     var polyline = L.polyline(arcPoints, {color: color, stroke: stroke, weight: weight}).addTo(map);
+    
+    console.log("polyline");
+    console.log(polyline);
+
+    return {polyline:polyline, marker1:{marker1_Latitude, marker1_Longitude}, marker2:{marker2_Latitude, marker2_Longitude}}
 }
 
 function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
@@ -244,6 +272,7 @@ const MapComponent = (props)=>{
                     markersFun(map, point)
                 });
                 props.connections.map((connection) => {
+                    console.log("test");
                     drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
                         connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
                 })
@@ -305,8 +334,10 @@ const MapComponent = (props)=>{
     useEffect(()=>{
         console.log(props.connections);
         const connection = props.connections[props.connections.length-1]
-        drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
+        var x = drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
             connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
+        console.log("x: ");
+        console.log(x);
 
 //todo
     }, [map, props.connections])
@@ -322,17 +353,6 @@ const MapComponent = (props)=>{
             // Call the addPoint function passed down as prop to add the new point
             props.addPoint(newPoint);
         };
-        
-        const isAddConnectionClickHandler = (e) => {
-            const newConnection = {
-                marker1: {Latitude: 34.23546050156551, Longitude: 50.46163671486197}, 
-                marker2: {Latitude: 34.23546050156551, Longitude: 49.46163671486197},
-                degree: '0.3',
-                status: 'green'
-            }
-            props.addConnection(newConnection)
-        };
-
 
 
         if (map){
@@ -350,10 +370,7 @@ const MapComponent = (props)=>{
                 map.off('click', isAddMarkerClickHandler); // Detach click handler when component unmounts or when isAddMarker becomes false
             };
         } else if(!props.isAddMarker && props.isAddConnection){
-            map.on('click', isAddConnectionClickHandler);
-            return () => {
-                map.off('click', isAddConnectionClickHandler);
-            };
+            
         }
 
     }, [map, props.isAddMarker, props.addPoint, props.isAddConnection]);
@@ -363,7 +380,7 @@ const MapComponent = (props)=>{
         <div id="map">
             <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
                 <ul className="markerContextMenu">
-                    <li className="markerContextMenuItem" onClick={()=>removeMarker(map, selectedMarker)}>remove marker</li>
+                    <li className="markerContextMenuItem" onClick={()=>removeMarker(map, selectedMarker, props.connections, props.removeConnection)}>remove marker</li>
                     <li className="lastMarkerContextMenuItem">Option 2</li>
                     {/* Add more options as needed */}
                 </ul>
