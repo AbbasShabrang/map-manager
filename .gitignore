@@ -22,3 +22,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+#serverSide
+/server_side/node_modules
+/server_side/.env
