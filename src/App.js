@@ -7,6 +7,7 @@ import './component/form.css'
 import TreeView from './component/TreeView.js';
 import DataView from './component/DataView.js';
 import MapBtn from './component/MapBtn.js';
+import { marker } from 'leaflet';
 
 let samplePoints = [
   {Latitude: 35.73546050156551, Longitude: 51.16163671486197},
@@ -27,8 +28,21 @@ function App() {
   const [isAddConnection, setIsAddConnection] = useState(false);
   const [mapType, setMapType] = useState('simple')
 
-  //new point
-  
+  useEffect(()=>{
+    const getAllMarkersFromDB = async ()=>{
+      try {
+        const response = await fetch("http://localhost:8080/api/markers")
+        const markersFromDB = await response.json()
+
+        console.log("DB test : ");
+        console.log(markersFromDB);
+      } catch (error) {
+        console.log(error);
+      }
+
+    }
+    getAllMarkersFromDB();
+  }, [])
 
 
   const addPoint = (newPoint) => {
@@ -37,6 +51,17 @@ function App() {
 
   const addConnection = (newConnection) => {
     setConnections(prevConnectios => [...prevConnectios, newConnection]);
+  }
+
+  const removeConnection = (removedConnection) => {
+    
+    // Filter out the removed connection from the connections state
+    const updatedConnections = connections.filter(connection => (
+      connection !== removedConnection
+    ));
+    
+    // Update the connections state with the filtered connections
+    setConnections(updatedConnections);
   }
 
   function turnOnIsMarker(){
@@ -83,7 +108,8 @@ function App() {
       <DataView></DataView>
       
       <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
-       isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} mapType={mapType} ></MapComponent>
+       isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} mapType={mapType}
+       removeConnection={removeConnection} ></MapComponent>
 
       <MapBtn changeMap={changeMap}/>
 
