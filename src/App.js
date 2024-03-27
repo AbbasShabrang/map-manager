@@ -10,10 +10,10 @@ import MapBtn from './component/MapBtn.js';
 import { marker } from 'leaflet';
 
 let samplePoints = [
-  {Latitude: 35.73546050156551, Longitude: 51.16163671486197},
-  {Latitude: 35.53546050156551, Longitude: 51.46163671486197},
-  {Latitude: 34.23546050156551, Longitude: 50.46163671486197},
-  {Latitude: 34.23546050156551, Longitude: 49.46163671486197}  
+  {name:"TEH1", Latitude: 35.73546050156551, Longitude: 51.16163671486197},
+  {name:"TEH2", Latitude: 35.53546050156551, Longitude: 51.46163671486197},
+  {name:"UKW1", Latitude: 34.23546050156551, Longitude: 50.46163671486197},
+  {name:"UKW2", Latitude: 34.23546050156551, Longitude: 49.46163671486197}  
 ];
 
 let sampleConnections = [
@@ -22,6 +22,7 @@ let sampleConnections = [
 
 function App() {
   const [addNewPoint, setAddNewPoint] = useState(false);
+  const [newPointName, setNewPointName] = useState(null);
   const [points, setPoints] = useState(samplePoints);
   const [connections , setConnections] = useState(sampleConnections)
   const [isAddMarker, setIsAddMarker] = useState(false);
@@ -65,6 +66,8 @@ function App() {
   }
 
   function turnOnIsMarker(){
+    addBtnHandler();
+
     setIsAddMarker(!isAddMarker);
     if(document.getElementById('add-Marker-tv').classList.contains('make-tv-active')){
       document.getElementById('add-Marker-tv').classList.remove('make-tv-active');
@@ -102,6 +105,23 @@ function App() {
     setAddNewPoint(false);
   }
 
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setNewPointName(event.target.elements.name.value);
+    turnOffNewPointModal();
+  };
+
+  useEffect(()=>{
+    console.log("newPointName");
+    console.log(newPointName);
+  }, [newPointName])
+
+  useEffect(()=>{
+    console.log("points : ");
+    console.log(points);
+  }, [points])
+
   return (
     <div className="App">
       <TreeView turnOnIsMarker={turnOnIsMarker} turnOnIsAddConnection={turnOnIsAddConnection}></TreeView>
@@ -109,7 +129,7 @@ function App() {
       
       <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
        isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} mapType={mapType}
-       removeConnection={removeConnection} ></MapComponent>
+       removeConnection={removeConnection} newPointName={newPointName} ></MapComponent>
 
       <MapBtn changeMap={changeMap}/>
 
@@ -117,7 +137,17 @@ function App() {
       {
         addNewPoint &&
         <NewPoint onDismiss={turnOffNewPointModal}>
-          <form onSubmit={turnOffNewPointModal}>
+          <form onSubmit={handleSubmit}>
+            <h2>Enter your point name!</h2>
+            <div className="item">
+              <label htmlFor="name">Marker Name<span>*</span></label>
+              <input id="name" type="text" name="name" required/>
+            </div>
+            <div className="btn-block">
+              <button className='form-btn' type="submit" href="/">Submit name</button>
+            </div>
+          </form> 
+          {/* <form onSubmit={turnOffNewPointModal}>
             <h2>Enter your point !</h2>
             <div className="item">
               <label htmlFor="Latitude">Latitude<span>*</span></label>
@@ -130,7 +160,7 @@ function App() {
             <div className="btn-block">
               <button className='form-btn' type="submit" href="/">Submit</button>
             </div>
-          </form>
+          </form> */}
         </NewPoint>
       }
     </div>

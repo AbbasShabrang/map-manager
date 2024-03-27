@@ -8,7 +8,7 @@ let secondMarkerSelected = null;
 
 function addNewMarker(map, point) {                                     //ok
     const marker = L.marker([point.Latitude, point.Longitude]).addTo(map)
-          .bindPopup(point.Latitude + " , "+ point.Longitude);
+          .bindPopup(point.name + " : " + point.Latitude + " , "+ point.Longitude);
 
     markerList.push(marker);
     return marker
@@ -346,12 +346,16 @@ const MapComponent = (props)=>{
     useEffect(()=>{
         const isAddMarkerClickHandler = (e) => {
             // Create a new point object with clicked coordinates
-            const newPoint = {
-                Latitude: e.latlng.lat,
-                Longitude: e.latlng.lng
-            };
-            // Call the addPoint function passed down as prop to add the new point
-            props.addPoint(newPoint);
+            if (props.newPointName) {
+                const newPoint = {
+                    name: props.newPointName,
+                    Latitude: e.latlng.lat,
+                    Longitude: e.latlng.lng
+                };
+                // Call the addPoint function passed down as prop to add the new point
+                props.addPoint(newPoint);    
+            }
+            
         };
 
 

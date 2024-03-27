@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './TreeView.css';
 // import StateContext from '../store/state-contex';
 
-const isOpenList = [true, false, false, false]
+const isOpenList = [true, false, false, true]
 
 const TreeView = (props)=>{
     const [isOpen, setIsOpen] = useState(isOpenList);
@@ -16,8 +16,62 @@ const TreeView = (props)=>{
         setIsOpen(updatedIsOpen);
     };
 
+    useEffect(() => {
+        const nodes = document.querySelectorAll(".nodes");
+        console.log("yeeeeeeeeeeeeeeeeeeee");
+        nodes.forEach((node) => {
+            console.log("nooooooooooooooo");
+
+            node.addEventListener("contextmenu", handleNodeClick);
+        });
+
+        return () => {
+            // Clean up event listeners when component unmounts
+            nodes.forEach((node) => {
+                node.removeEventListener("contextmenu", handleNodeClick);
+            });
+        };
+    }, []);
+
+    const handleNodeClick = (event) => {
+        event.preventDefault();
+        console.log("node targrt:", event.target);
+        
+        
+
+        showContextMenuOfNode(event);
+        // hideContextMenuOfNodes();  //TODO: use this function to close context menu in treeView
+    }
+
+    const showContextMenuOfNode = (event)=>{
+        const nodeName = event.target.innerText;
+        console.log("Clicked node:", nodeName);
+
+        const nodePosition = event.target.getBoundingClientRect();
+        console.log("nodePosition:", nodePosition);
+
+        const contextMenuMarker = document.getElementById('nodeContextMenu');
+        contextMenuMarker.style.display = 'block';
+        contextMenuMarker.style.left = nodePosition.x + 'px';
+        contextMenuMarker.style.top = nodePosition.y + 'px';
+    }
+
+    function hideContextMenuOfNodes() {                                                   //ok
+        const contextMenu = document.getElementById('nodeContextMenu');
+        contextMenu.style.display = 'none';
+    }
+
     return(
         <ul id="tree-view">
+            
+            <div id="nodeContextMenu" style={{ display: 'none', position: 'absolute' }}>
+                <ul className="nodeContextMenuUl">
+                    <li className="markerContextMenuItem">remove marker</li>
+                    <li className="lastMarkerContextMenuItem">Option 2</li>
+                    {/* Add more options as needed */}
+                </ul>
+            </div>
+
             <li id="root-tree-view"><span className={`caret ${isOpen[0] ? 'caret-down' : ''}`} onClick={()=>handleToggle(0)}>Network</span>
                 <ul className={`nested ${isOpen[0] ? 'active' : ''}`}>
                 <li><span className={`caret ${isOpen[1] ? 'caret-down' : ''}`} onClick={()=>handleToggle(1)}>Marker</span>
@@ -36,8 +90,8 @@ const TreeView = (props)=>{
 
                 <li><span className={`caret ${isOpen[3] ? 'caret-down' : ''}`} onClick={()=>handleToggle(3)}>Nodes</span>
                     <ul className={`nested ${isOpen[3] ? 'active' : ''}`}>
-                    <li>TH1</li>
-                    <li>TH2</li>
+                    <li className="nodes">TH1</li>
+                    <li className="nodes">TH2</li>
                     </ul>
                 </li>
 
