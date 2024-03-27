@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import L, { map, marker } from 'leaflet';
+import L, { map, marker, point } from 'leaflet';
 import 'leaflet-geometryutil';
 
 const markerList = [];
@@ -346,15 +346,15 @@ const MapComponent = (props)=>{
     useEffect(()=>{
         const isAddMarkerClickHandler = (e) => {
             // Create a new point object with clicked coordinates
-            if (props.newPointName) {
-                const newPoint = {
-                    name: props.newPointName,
-                    Latitude: e.latlng.lat,
-                    Longitude: e.latlng.lng
-                };
-                // Call the addPoint function passed down as prop to add the new point
-                props.addPoint(newPoint);    
-            }
+            const newPoint = {
+                name: props.newPointName,
+                Latitude: e.latlng.lat,
+                Longitude: e.latlng.lng
+            };
+            // Call the addPoint function passed down as prop to add the new point
+            props.addPoint(newPoint);
+            //todo
+            props.turnOnIsMarker()
             
         };
 

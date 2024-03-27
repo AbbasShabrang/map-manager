@@ -66,9 +66,16 @@ function App() {
   }
 
   function turnOnIsMarker(){
-    addBtnHandler();
+    if (!isAddMarker) {
+      addBtnHandler();
+    }
 
     setIsAddMarker(!isAddMarker);
+    activeDeActiveMarker()
+  }
+
+
+  function activeDeActiveMarker() {
     if(document.getElementById('add-Marker-tv').classList.contains('make-tv-active')){
       document.getElementById('add-Marker-tv').classList.remove('make-tv-active');
     }else{
@@ -115,6 +122,11 @@ function App() {
   useEffect(()=>{
     console.log("newPointName");
     console.log(newPointName);
+    if (newPointName && points.some(point => point.name === newPointName)) {
+      activeDeActiveMarker()
+      setIsAddMarker(!isAddMarker);
+    }
+
   }, [newPointName])
 
   useEffect(()=>{
@@ -129,14 +141,19 @@ function App() {
       
       <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
        isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} mapType={mapType}
-       removeConnection={removeConnection} newPointName={newPointName} ></MapComponent>
+       removeConnection={removeConnection} newPointName={newPointName}></MapComponent>
 
       <MapBtn changeMap={changeMap}/>
 
       <AddBtn AddBtn={addBtnHandler}/>
       {
         addNewPoint &&
-        <NewPoint onDismiss={turnOffNewPointModal}>
+        <NewPoint onDismiss={()=>{
+          turnOffNewPointModal()
+          activeDeActiveMarker()
+          setIsAddMarker(!isAddMarker);
+
+        }}>
           <form onSubmit={handleSubmit}>
             <h2>Enter your point name!</h2>
             <div className="item">
