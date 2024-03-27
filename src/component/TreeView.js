@@ -52,7 +52,7 @@ const TreeView = (props)=>{
 
         const contextMenuMarker = document.getElementById('nodeContextMenu');
         contextMenuMarker.style.display = 'block';
-        contextMenuMarker.style.left = nodePosition.x + 'px';
+        contextMenuMarker.style.left = (nodePosition.x+25) + 'px';
         contextMenuMarker.style.top = nodePosition.y + 'px';
     }
 
@@ -66,8 +66,8 @@ const TreeView = (props)=>{
             
             <div id="nodeContextMenu" style={{ display: 'none', position: 'absolute' }}>
                 <ul className="nodeContextMenuUl">
-                    <li className="markerContextMenuItem">remove marker</li>
-                    <li className="lastMarkerContextMenuItem">Option 2</li>
+                    <li className="nodeContextMenuItem">remove marker</li>
+                    <li className="lastNodeContextMenuItem">Option 2</li>
                     {/* Add more options as needed */}
                 </ul>
             </div>

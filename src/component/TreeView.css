@@ -65,3 +65,31 @@ li{
 .nodes:hover{
   color: brown;
 }
+
+
+#nodeContextMenu{
+  z-index: 1000;
+  background: burlywood;
+  border-radius: 10px;
+}
+
+.nodeContextMenuUl{
+  padding-inline: 0;
+  margin-block-start: 0px;
+  margin-block-end: 0px;
+}
+
+.nodeContextMenuItem{
+  padding-bottom: 3px;
+  border-bottom-color: rgb(210, 162, 100)!important;
+  padding-inline: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-top: 3px;
+
+}
+
+.lastNodeContextMenuItem{
+  padding-inline: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
