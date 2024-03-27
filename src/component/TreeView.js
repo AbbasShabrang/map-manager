@@ -4,9 +4,16 @@ import './TreeView.css';
 
 const isOpenList = [true, false, false, true]
 
+
+
 const TreeView = (props)=>{
     const [isOpen, setIsOpen] = useState(isOpenList);
 
+    const handleClickOutside = (event) => {
+        if (!event.target.closest("#nodeContextMenu")) {
+            hideContextMenuOfNodes();
+        }
+    };
 
     // const ctx = useContext(StateContext);
 
@@ -24,12 +31,16 @@ const TreeView = (props)=>{
 
             node.addEventListener("contextmenu", handleNodeClick);
         });
+        document.addEventListener("click", handleClickOutside);
 
         return () => {
             // Clean up event listeners when component unmounts
             nodes.forEach((node) => {
                 node.removeEventListener("contextmenu", handleNodeClick);
             });
+
+            document.removeEventListener("click", handleClickOutside);
+
         };
     }, []);
 
@@ -90,8 +101,8 @@ const TreeView = (props)=>{
 
                 <li><span className={`caret ${isOpen[3] ? 'caret-down' : ''}`} onClick={()=>handleToggle(3)}>Nodes</span>
                     <ul className={`nested ${isOpen[3] ? 'active' : ''}`}>
-                    <li className="nodes">TH1</li>
-                    <li className="nodes">TH2</li>
+                    <li className="nodes">TEH1</li>
+                    <li className="nodes">TEH2</li>
                     </ul>
                 </li>
 

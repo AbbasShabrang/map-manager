@@ -163,6 +163,13 @@ function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
     
 }
 
+const handleClickOutside = (event) => {
+    if (!event.target.closest("#nodeContextMenu")) {
+        hideContextMenuOfMarkers();
+    }
+};
+
+
 // function getMarkerByLatLng(latlng) {
 //     for (let i = 0; i < markerList.length; i++) {
 //       const marker = markerList[i];
@@ -327,6 +334,8 @@ const MapComponent = (props)=>{
                 console.log("abbbbbbbas : ", e.type);
                 hideContextMenuOfMarkers();
             });
+            document.addEventListener("click", handleClickOutside);
+
         }
     }, [map, firstInitialized]);
 
