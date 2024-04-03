@@ -55,14 +55,11 @@ function App() {
   }
 
   const removeConnection = (removedConnection) => {
-    
-    console.log("testttttttttttttttttttttttttttx : ");
-    console.log(removedConnection);
+
     // Filter out the removed connection from the connections state
     const updatedConnections = connections.filter(connection => (
       connection !== removedConnection
     ));
-    console.log("miaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad");
     // Update the connections state with the filtered connections
     setConnections(updatedConnections);
   }
@@ -93,10 +90,6 @@ function App() {
     }
   }
 
-  useEffect(()=>{
-    console.log(mapType);
-  }, [mapType])
-
   function turnOnIsAddConnection(){
     setIsAddConnection(!isAddConnection);
     if(document.getElementById('add-Connection-tv').classList.contains('make-tv-active')){
@@ -122,25 +115,12 @@ function App() {
   };
 
   useEffect(()=>{
-    console.log("newPointName");
-    console.log(newPointName);
     if (newPointName && points.some(point => point.name === newPointName)) {
       activeDeActiveMarker()
       setIsAddMarker(!isAddMarker);
     }
 
   }, [newPointName])
-
-
-  useEffect(()=>{
-
-    console.log("connections : ", connections);
-  }, [connections])
-
-  useEffect(()=>{
-    console.log("points : ");
-    console.log(points);
-  }, [points])
 
   return (
     <div className="App">

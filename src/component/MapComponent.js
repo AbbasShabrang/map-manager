@@ -88,8 +88,6 @@ function removeConnectionsRelatedToRemovedMarker(map, removedMarker, connections
 
     // Remove the corresponding layers from the map
     connectionsToRemove.forEach(connection => {
-        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        console.log("aaaaaaaaaaaaaaaambjhsahgfcdg: ", connection);
         map.removeLayer(connection.polyline);
     });
 }
@@ -157,7 +155,6 @@ function changeOnClickOfAddConnection(map, isAddConnection, addConnection, point
                     }
                 }
                 if (firstMarkerSelected != null && secondMarkerSelected != null) {
-                    console.log("let's goooooooooooooooooo");
                     const newConnection = { marker1: firstMarkerSelected, marker2: secondMarkerSelected, degree: '0.4', status: 'yellow' };
                     addConnection(newConnection);
                     drawConnection(map, newConnection.marker1.Latitude, newConnection.marker1.Longitude,
@@ -208,7 +205,6 @@ const MapComponent = (props)=>{
 
     function markersFun(map, point) {                                       //ok
         const marker = addNewMarker(map, point);
-        // console.log(markerList);
         marker.getPane()
     
         marker.on('mouseover', () => {
@@ -221,17 +217,7 @@ const MapComponent = (props)=>{
             },200);
         });
     
-        // marker.on('popupopen', () => {
-        //     console.log('Popup opened');
-        // });
-    
         marker.on('contextmenu', (e)=>{
-            const latlng = marker.getLatLng();
-            console.log('Latitude:', latlng.lat, 'Longitude:', latlng.lng);
-            // let x = e.containerPoint.x;
-            // let y = e.containerPoint.y;
-            // console.log(x);
-            // console.log(y);
             showContextMenuOfMarkers(marker);
             setSelectedMarker(marker);
         })
@@ -258,12 +244,10 @@ const MapComponent = (props)=>{
                 contextMenu.style.background =  "url('/simple-map-icon.png') no-repeat center center rgba(255, 238, 217, 0.495)";
 
                 setMapAddress('./IRAN/SATTELITE/{z}/{x}/{y}.jpg');
-                console.log("not simmmmmmmmmmmmple");
             } else {
                 contextMenu.style.background =  "url('/sattelite-icon.png') no-repeat center center rgba(255, 238, 217, 0.495)";
 
                 setMapAddress('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png');
-                console.log("simmmmmmmmmmmmple");
             }
         }else {
             console.log("Element with ID 'map-btn' not found.");
@@ -297,7 +281,6 @@ const MapComponent = (props)=>{
                     markersFun(map, point)
                 });
                 props.connections.map((connection) => {
-                    console.log("test");
                     drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
                         connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
                 })
@@ -369,12 +352,7 @@ const MapComponent = (props)=>{
             const connection = props.connections[props.connections.length-1]
             var x = drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
                 connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
-            console.log("x: ");
-            console.log(x);
     
-        }else{
-            console.log("you should remove connection here");
-
         }
         
 //todo
