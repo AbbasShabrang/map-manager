@@ -70,7 +70,7 @@ li{
 #nodeContextMenu{
   z-index: 1000;
   background: burlywood;
-  border-radius: 10px;
+  border-radius: 0px 10px 10px 10px
 }
 
 .nodeContextMenuUl{
@@ -85,6 +85,7 @@ li{
   padding-inline: 10px;
   border-bottom: 1px solid #ccc;
   padding-top: 3px;
+  
 
 }
 

@@ -3,6 +3,8 @@ import L, { map, marker, point } from 'leaflet';
 import 'leaflet-geometryutil';
 
 const markerList = [];
+const polylineList = [];
+
 let firstMarkerSelected = null;
 let secondMarkerSelected = null;
 
@@ -43,7 +45,7 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
     return points;
 }
 
-function removeMarker(map, marker, connections, removeConnection) {
+function removeMarker(map, marker, connections, setConnections, points, setPoints) {
     if (marker != null) {
         map.removeLayer(marker);
         
@@ -53,31 +55,43 @@ function removeMarker(map, marker, connections, removeConnection) {
         }
     }
 
-    removeConnectionsRelatedToRemovedMarker(map, marker, connections, removeConnection)
+    const removedPoint = points.find(point => point.Latitude === marker.getLatLng().lat && point.Longitude === marker.getLatLng().lng);
+        if (removedPoint) {
+            const updatedPoints = points.filter(point => point !== removedPoint);
+            setPoints(updatedPoints);
+        }
+
+    removeConnectionsRelatedToRemovedMarker(map, removedPoint, connections, setConnections)
 }
 
-function removeConnectionsRelatedToRemovedMarker(map, marker, connections, removeConnection) {
+function removeConnectionsRelatedToRemovedMarker(map, removedMarker, connections, setConnections) {
+    console.log("removedPoint : ", removedMarker);
+    const connectionsToRemove = polylineList.filter(polylineElement => {
+        const marker1Match = removedMarker.Latitude === polylineElement.mark1LatLng.lat && removedMarker.Longitude === polylineElement.mark1LatLng.lng;
+        const marker2Match = removedMarker.Latitude === polylineElement.mark2LatLng.lat && removedMarker.Longitude === polylineElement.mark2LatLng.lng;
 
-    connections.map((connection) => {
-        console.log("hi");
-        if (marker._latlng.lat === connection.marker1.Latitude) {
-            if (marker._latlng.lng === connection.marker1.Longitude) {
-                map.removeLayer(connection)
-                removeConnection()
-                console.log("11111111111");
-            }
-        }
-        else if(marker._latlng.lat === connection.marker2.Latitude){
-            if (marker._latlng.lng === connection.marker2.Longitude) {
-                map.removeLayer(connection)
-                removeConnection()
-                console.log("222222222222");
-            }
-        }
+        // Keep connections where either marker1 or marker2 doesn't match the removed marker
+        return (marker1Match || marker2Match);
+    });
 
-    })
+    const updatedConnections = connections.filter(connection => {
+        const marker1Match = removedMarker.Latitude === connection.marker1.Latitude && removedMarker.Longitude === connection.marker1.Longitude;
+        const marker2Match = removedMarker.Latitude === connection.marker2.Latitude && removedMarker.Longitude === connection.marker2.Longitude;
 
-    
+        // Keep connections where either marker1 or marker2 doesn't match the removed marker
+        return !(marker1Match || marker2Match);
+    });
+
+
+    // // Update the connections state with the filtered connections
+    setConnections(updatedConnections);
+
+    // Remove the corresponding layers from the map
+    connectionsToRemove.forEach(connection => {
+        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        console.log("aaaaaaaaaaaaaaaambjhsahgfcdg: ", connection);
+        map.removeLayer(connection.polyline);
+    });
 }
 
 
@@ -119,49 +133,51 @@ function drawConnection(map, marker1_Latitude, marker1_Longitude, marker2_Latitu
 
     // Create a polyline
     var polyline = L.polyline(arcPoints, {color: color, stroke: stroke, weight: weight}).addTo(map);
-    
-    console.log("polyline");
-    console.log(polyline);
-
+    polylineList.push({polyline:polyline, mark1LatLng:{lat:marker1_Latitude, lng:marker1_Longitude},
+         mark2LatLng:{lat:marker2_Latitude, lng:marker2_Longitude} } )
     return {polyline:polyline, marker1:{marker1_Latitude, marker1_Longitude}, marker2:{marker2_Latitude, marker2_Longitude}}
 }
 
-function changeOnClickOfAddConnection(map, isAddConnection, addConnection){
-    markerList.map((marker)=>{
+function changeOnClickOfAddConnection(map, isAddConnection, addConnection, points, turnOnIsAddConnection) {
+    markerList.map((marker) => {
         if (isAddConnection) {
             marker.off('click');
-            marker.on('click', ()=>{
+            marker.on('click', () => {
                 console.log(marker);
 
+                // Find the corresponding point in points state based on marker's lat and lng
+                const selectedPoint = points.find(point => point.Latitude === marker.getLatLng().lat && point.Longitude === marker.getLatLng().lng);
+                
                 if (firstMarkerSelected == null) {
-                    firstMarkerSelected = marker
-                }else if(secondMarkerSelected == null){
-                    secondMarkerSelected = marker
-                    if(secondMarkerSelected === firstMarkerSelected){
-                        secondMarkerSelected = null
+                    firstMarkerSelected = selectedPoint;
+                } else if (secondMarkerSelected == null) {
+                    secondMarkerSelected = selectedPoint;
+                    if (secondMarkerSelected === firstMarkerSelected) {
+                        secondMarkerSelected = null;
                     }
                 }
                 if (firstMarkerSelected != null && secondMarkerSelected != null) {
                     console.log("let's goooooooooooooooooo");
-                    const newConnection = {marker1: firstMarkerSelected, marker2: secondMarkerSelected , degree: '0.4', status: 'yellow'}
+                    const newConnection = { marker1: firstMarkerSelected, marker2: secondMarkerSelected, degree: '0.4', status: 'yellow' };
                     addConnection(newConnection);
-                    // console.log(newConnection.marker1);
-                    drawConnection(map, newConnection.marker1._latlng.lat, newConnection.marker1._latlng.lng,
-                         newConnection.marker2._latlng.lat, newConnection.marker2._latlng.lng,
-                         newConnection.status, true, 5, newConnection.degree)
+                    drawConnection(map, newConnection.marker1.Latitude, newConnection.marker1.Longitude,
+                        newConnection.marker2.Latitude, newConnection.marker2.Longitude,
+                        newConnection.status, true, 5, newConnection.degree);
                     makeMarkersNull();
+                    turnOnIsAddConnection(false)
                 }
             })
-            
-        }else{
+
+        } else {
             marker.off('click');
-            marker.on('click', ()=>{
+            marker.on('click', () => {
                 console.log("you clicked on a marker");
             })
         }
     })
-    
+
 }
+
 
 const handleClickOutside = (event) => {
     if (!event.target.closest("#nodeContextMenu")) {
@@ -185,7 +201,9 @@ const MapComponent = (props)=>{
     const [selectedMarker, setSelectedMarker] = useState(null);
     const [isMapInitialized, setIsMapInitialized] = useState(false);
     const [firstInitialized, setFirstInitialized] = useState(false);
+    const [newPointAdded, setNewPointAdded] = useState(false);
     const [mapAddress, setMapAddress] = useState('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png')
+    const [polylineLayers, setPolylineLayers] = useState([]);
 
 
     function markersFun(map, point) {                                       //ok
@@ -283,12 +301,17 @@ const MapComponent = (props)=>{
                     drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
                         connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
                 })
-            setFirstInitialized(true);
+                setFirstInitialized(true);
 
             }else{
-                markersFun(map, props.points[props.points.length-1])
+                if (newPointAdded) {
+                    markersFun(map, props.points[props.points.length-1])
+                    setNewPointAdded(false)
+                    
+                }else{
+                    changeOnClickOfAddConnection(map, props.isAddConnection, props.addConnection, props.points, props.turnOnIsAddConnection)
+                }
 
-                changeOnClickOfAddConnection(map, props.isAddConnection, props.addConnection)
 
                 
             }
@@ -314,7 +337,7 @@ const MapComponent = (props)=>{
     
         }
         
-      }, [props.points, map, props.isAddConnection]);
+      }, [newPointAdded, map, props.isAddConnection]);
 
     useEffect(() => {
         if (map && !firstInitialized) {
@@ -341,15 +364,24 @@ const MapComponent = (props)=>{
 
 
     useEffect(()=>{
-        console.log(props.connections);
-        const connection = props.connections[props.connections.length-1]
-        var x = drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
-            connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
-        console.log("x: ");
-        console.log(x);
+        if (props.isAddConnection){
+            console.log(props.connections);
+            const connection = props.connections[props.connections.length-1]
+            var x = drawConnection(map, connection.marker1.Latitude, connection.marker1.Longitude,
+                connection.marker2.Latitude, connection.marker2.Longitude, connection.status, true, 5, connection.degree)
+            console.log("x: ");
+            console.log(x);
+    
+        }else{
+            console.log("you should remove connection here");
 
+        }
+        
 //todo
     }, [map, props.connections])
+
+
+
 
 
     useEffect(()=>{
@@ -362,6 +394,7 @@ const MapComponent = (props)=>{
             };
             // Call the addPoint function passed down as prop to add the new point
             props.addPoint(newPoint);
+            setNewPointAdded(true)
             //todo
             props.turnOnIsMarker()
             
@@ -393,7 +426,7 @@ const MapComponent = (props)=>{
         <div id="map">
             <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
                 <ul className="markerContextMenu">
-                    <li className="markerContextMenuItem" onClick={()=>removeMarker(map, selectedMarker, props.connections, props.removeConnection)}>remove marker</li>
+                    <li className="markerContextMenuItem" onClick={()=>removeMarker(map, selectedMarker, props.connections, props.setConnections, props.points, props.setPoints)}>remove marker</li>
                     <li className="lastMarkerContextMenuItem">Option 2</li>
                     {/* Add more options as needed */}
                 </ul>

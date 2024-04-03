@@ -10,8 +10,10 @@ const TreeView = (props)=>{
     const [isOpen, setIsOpen] = useState(isOpenList);
 
     const handleClickOutside = (event) => {
-        if (!event.target.closest("#nodeContextMenu")) {
+        if (!event.target.closest("#nodeContextMenu") && !event.target.closest("#nodesContextMenu")) {
             hideContextMenuOfNodes();
+            hideContextMenuOfNode();
+
         }
     };
 
@@ -24,10 +26,13 @@ const TreeView = (props)=>{
     };
 
     useEffect(() => {
-        const nodes = document.querySelectorAll(".nodes");
-        console.log("yeeeeeeeeeeeeeeeeeeee");
+        const nodes = document.querySelectorAll(".node");
+        const nodesElement = document.querySelectorAll(".nodes");
+
+
+        // nodesElement.addEventListener("contextmenu", handleNodesClick);
+
         nodes.forEach((node) => {
-            console.log("nooooooooooooooo");
 
             node.addEventListener("contextmenu", handleNodeClick);
         });
@@ -38,6 +43,7 @@ const TreeView = (props)=>{
             nodes.forEach((node) => {
                 node.removeEventListener("contextmenu", handleNodeClick);
             });
+            nodesElement.removeEventListener("contextmenu", handleNodesClick);
 
             document.removeEventListener("click", handleClickOutside);
 
@@ -51,7 +57,12 @@ const TreeView = (props)=>{
         
 
         showContextMenuOfNode(event);
-        // hideContextMenuOfNodes();  //TODO: use this function to close context menu in treeView
+    }
+
+    const handleNodesClick = (event) => {
+        event.preventDefault();        
+        
+        showContextMenuOfNodes(event);
     }
 
     const showContextMenuOfNode = (event)=>{
@@ -64,17 +75,41 @@ const TreeView = (props)=>{
         const contextMenuMarker = document.getElementById('nodeContextMenu');
         contextMenuMarker.style.display = 'block';
         contextMenuMarker.style.left = (nodePosition.x+25) + 'px';
-        contextMenuMarker.style.top = nodePosition.y + 'px';
+        contextMenuMarker.style.top = (nodePosition.y+14) + 'px';
     }
 
-    function hideContextMenuOfNodes() {                                                   //ok
+    const showContextMenuOfNodes = (event)=>{
+
+        const nodesPosition = event.target.getBoundingClientRect();
+        console.log("nodesPosition:", nodesPosition);
+
+        const contextMenuMarker = document.getElementById('nodesContextMenu');
+        contextMenuMarker.style.display = 'block';
+        contextMenuMarker.style.left = (nodesPosition.x+25) + 'px';
+        contextMenuMarker.style.top = nodesPosition.y + 'px';
+    }
+
+    function hideContextMenuOfNode() {                                                   //ok
         const contextMenu = document.getElementById('nodeContextMenu');
+        contextMenu.style.display = 'none';
+    }
+
+
+    function hideContextMenuOfNodes() {                                                   //ok
+        const contextMenu = document.getElementById('nodesContextMenu');
         contextMenu.style.display = 'none';
     }
 
     return(
         <ul id="tree-view">
-            
+            <div id="nodesContextMenu" style={{ display: 'none', position: 'absolute' }}>
+                <ul className="nodeContextMenuUl">
+                    <li className="nodeContextMenuItem">add new marker</li>
+                    <li className="lastNodeContextMenuItem">Option 2</li>
+                    {/* Add more options as needed */}
+                </ul>
+            </div>
+
             <div id="nodeContextMenu" style={{ display: 'none', position: 'absolute' }}>
                 <ul className="nodeContextMenuUl">
                     <li className="nodeContextMenuItem">remove marker</li>
@@ -101,8 +136,8 @@ const TreeView = (props)=>{
 
                 <li><span className={`caret ${isOpen[3] ? 'caret-down' : ''}`} onClick={()=>handleToggle(3)}>Nodes</span>
                     <ul className={`nested ${isOpen[3] ? 'active' : ''}`}>
-                    <li className="nodes">TEH1</li>
-                    <li className="nodes">TEH2</li>
+                    <li className="node">TEH1</li>
+                    <li className="node">TEH2</li>
                     </ul>
                 </li>
 

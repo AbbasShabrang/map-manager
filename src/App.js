@@ -56,11 +56,13 @@ function App() {
 
   const removeConnection = (removedConnection) => {
     
+    console.log("testttttttttttttttttttttttttttx : ");
+    console.log(removedConnection);
     // Filter out the removed connection from the connections state
     const updatedConnections = connections.filter(connection => (
       connection !== removedConnection
     ));
-    
+    console.log("miaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad");
     // Update the connections state with the filtered connections
     setConnections(updatedConnections);
   }
@@ -129,6 +131,12 @@ function App() {
 
   }, [newPointName])
 
+
+  useEffect(()=>{
+
+    console.log("connections : ", connections);
+  }, [connections])
+
   useEffect(()=>{
     console.log("points : ");
     console.log(points);
@@ -140,8 +148,8 @@ function App() {
       <DataView></DataView>
       
       <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
-       isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} mapType={mapType}
-       removeConnection={removeConnection} newPointName={newPointName}></MapComponent>
+       isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} turnOnIsAddConnection={turnOnIsAddConnection} mapType={mapType}
+       removeConnection={removeConnection} newPointName={newPointName} setConnections={setConnections} setPoints={setPoints}></MapComponent>
 
       <MapBtn changeMap={changeMap}/>
 
