@@ -4,6 +4,7 @@ import 'leaflet-geometryutil';
 
 const markerList = [];
 const polylineList = [];
+var pointsToUseInMapComponent = null;
 
 let firstMarkerSelected = null;
 let secondMarkerSelected = null;
@@ -11,7 +12,8 @@ let secondMarkerSelected = null;
 function addNewMarker(map, point) {                                     //ok
     const marker = L.marker([point.Latitude, point.Longitude]).addTo(map)
           .bindPopup(point.name + " : " + point.Latitude + " , "+ point.Longitude);
-
+        
+    
     markerList.push(marker);
     return marker
 }
@@ -45,6 +47,41 @@ function calculateArcPoints(map, latlng1, latlng2, curvature) {
     return points;
 }
 
+async function deleteMarkerFromDB(markerName) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/markers/${markerName}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            console.log(`Marker with name ${markerName} deleted successfully`);
+        } else {
+            console.error('Failed to delete marker');
+        }
+    } catch (error) {
+        console.error('Error deleting marker:', error);
+    }
+};
+
+export function findAndRemoveMarker(nodeName, map, connections, setConnections, points, setPoints) {
+    const point = pointsToUseInMapComponent.find(point => point.name === nodeName);
+
+    if (point) {
+        // Find the corresponding marker in markersList
+        const correspondingMarker = markerList.find(marker => 
+          marker.getLatLng().lat === point.Latitude && marker.getLatLng().lng === point.Longitude
+        );
+        removeMarker(map, correspondingMarker, connections, setConnections, points, setPoints)
+    }else{
+        console.log("not found!!!!!!!!");
+    }
+
+    deleteMarkerFromDB(nodeName)
+
+}
 function removeMarker(map, marker, connections, setConnections, points, setPoints) {
     if (marker != null) {
         map.removeLayer(marker);
@@ -194,14 +231,17 @@ const handleClickOutside = (event) => {
 // }
 
 const MapComponent = (props)=>{
-    const [map, setMap] = useState(null);
     const [selectedMarker, setSelectedMarker] = useState(null);
     const [isMapInitialized, setIsMapInitialized] = useState(false);
     const [firstInitialized, setFirstInitialized] = useState(false);
     const [newPointAdded, setNewPointAdded] = useState(false);
     const [mapAddress, setMapAddress] = useState('./IRAN/SIMPLE_MAP/{z}/{x}/{y}.png')
-    const [polylineLayers, setPolylineLayers] = useState([]);
+    const [map, setMap] = useState(null);
 
+
+    useEffect(()=>{
+        pointsToUseInMapComponent = props.points;
+    }, [props.points])
 
     function markersFun(map, point) {                                       //ok
         const marker = addNewMarker(map, point);
@@ -231,6 +271,7 @@ const MapComponent = (props)=>{
     useEffect(() => {                                                                   //ok
         if (!isMapInitialized) {
             const map = L.map('map').setView([props.points[0].Latitude, props.points[0].Longitude], 7);
+            props.setMap(map);
             setMap(map);
             setIsMapInitialized(true);
         }
@@ -371,7 +412,7 @@ const MapComponent = (props)=>{
                 Longitude: e.latlng.lng
             };
             // Call the addPoint function passed down as prop to add the new point
-            props.addPoint(newPoint);
+            props.addPoint(newPoint); /////////////////////////////////////////////////////////////todo: add new point in data base
             setNewPointAdded(true)
             //todo
             props.turnOnIsMarker()
