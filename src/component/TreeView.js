@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import './TreeView.css';
+import { findAndRemoveMarker } from "./MapComponent";
 // import StateContext from '../store/state-contex';
 
 const isOpenList = [true, false, false, true]
@@ -8,6 +9,7 @@ const isOpenList = [true, false, false, true]
 
 const TreeView = (props)=>{
     const [isOpen, setIsOpen] = useState(isOpenList);
+    const [clickedNode, setClickedNode] = useState("");
 
     const handleClickOutside = (event) => {
         if (!event.target.closest("#nodeContextMenu") && !event.target.closest("#nodesContextMenu")) {
@@ -27,9 +29,10 @@ const TreeView = (props)=>{
 
     useEffect(() => {
         const nodes = document.querySelectorAll(".node");
-        const nodesElement = document.querySelectorAll(".nodes");
+        const nodesElements = document.querySelector(".nodes");
 
 
+        console.log(nodesElements);
         // nodesElement.addEventListener("contextmenu", handleNodesClick);
 
         nodes.forEach((node) => {
@@ -38,29 +41,41 @@ const TreeView = (props)=>{
         });
         document.addEventListener("click", handleClickOutside);
 
+        
+        nodesElements.addEventListener("contextmenu", handleNodesClick);
+
         return () => {
             // Clean up event listeners when component unmounts
             nodes.forEach((node) => {
                 node.removeEventListener("contextmenu", handleNodeClick);
             });
-            nodesElement.removeEventListener("contextmenu", handleNodesClick);
+            
+            nodesElements.removeEventListener("contextmenu", handleNodesClick);
 
             document.removeEventListener("click", handleClickOutside);
-
         };
-    }, []);
+    }, [props.markers]);
+
+    useEffect(()=>{
+
+        
+    }, [])
 
     const handleNodeClick = (event) => {
         event.preventDefault();
         console.log("node targrt:", event.target);
+        hideContextMenuOfNodes();
+        hideContextMenuOfNode();
         
-        
+        setClickedNode(event.target.innerText);
 
         showContextMenuOfNode(event);
     }
 
     const handleNodesClick = (event) => {
-        event.preventDefault();        
+        event.preventDefault();     
+        hideContextMenuOfNodes();
+        hideContextMenuOfNode();   
         
         showContextMenuOfNodes(event);
     }
@@ -86,7 +101,7 @@ const TreeView = (props)=>{
         const contextMenuMarker = document.getElementById('nodesContextMenu');
         contextMenuMarker.style.display = 'block';
         contextMenuMarker.style.left = (nodesPosition.x+25) + 'px';
-        contextMenuMarker.style.top = nodesPosition.y + 'px';
+        contextMenuMarker.style.top = (nodesPosition.y+14) + 'px';
     }
 
     function hideContextMenuOfNode() {                                                   //ok
@@ -98,6 +113,22 @@ const TreeView = (props)=>{
     function hideContextMenuOfNodes() {                                                   //ok
         const contextMenu = document.getElementById('nodesContextMenu');
         contextMenu.style.display = 'none';
+    }
+
+    function handleClickOnRemoveNode(clickedNode) {
+        hideContextMenuOfNode()
+        findAndRemoveMarker(clickedNode, props.map, props.connections, props.setConnections, props.points, props.setPoints)
+        removeNodeNameFromTreeView(clickedNode)
+
+    }
+
+    function removeNodeNameFromTreeView(clickedNode) {
+        const nodes = document.querySelectorAll(".node")
+        nodes.forEach((node)=>{
+            if (node.innerText === clickedNode) {
+                node.style.display = 'none';
+            }
+        })
     }
 
     return(
@@ -112,8 +143,9 @@ const TreeView = (props)=>{
 
             <div id="nodeContextMenu" style={{ display: 'none', position: 'absolute' }}>
                 <ul className="nodeContextMenuUl">
-                    <li className="nodeContextMenuItem">remove marker</li>
-                    <li className="lastNodeContextMenuItem">Option 2</li>
+                    <li className="nodeContextMenuItem" onClick={()=>handleClickOnRemoveNode(clickedNode)}>remove marker</li>
+                    <li className="nodeContextMenuItem">Update marker</li>
+                    <li className="lastNodeContextMenuItem">view relative Connection</li>
                     {/* Add more options as needed */}
                 </ul>
             </div>
@@ -134,10 +166,13 @@ const TreeView = (props)=>{
                     </ul>
                 </li>
 
-                <li><span className={`caret ${isOpen[3] ? 'caret-down' : ''}`} onClick={()=>handleToggle(3)}>Nodes</span>
+                <li><span className={`caret ${isOpen[3] ? 'caret-down' : ''} nodes`} onClick={()=>handleToggle(3)}>Nodes</span>
                     <ul className={`nested ${isOpen[3] ? 'active' : ''}`}>
-                    <li className="node">TEH1</li>
-                    <li className="node">TEH2</li>
+                    {
+                        props.markers.map((marker, index) => (
+                            <li key={marker.id} className="node">{marker.name}</li>
+                        ))
+                    }
                     </ul>
                 </li>
 

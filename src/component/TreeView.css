@@ -65,9 +65,18 @@ li{
 .nodes:hover{
   color: brown;
 }
+.node:hover{
+  color: brown;
+}
 
 
 #nodeContextMenu{
+  z-index: 1000;
+  background: burlywood;
+  border-radius: 0px 10px 10px 10px
+}
+
+#nodesContextMenu{
   z-index: 1000;
   background: burlywood;
   border-radius: 0px 10px 10px 10px

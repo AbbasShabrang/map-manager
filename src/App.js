@@ -21,6 +21,7 @@ let sampleConnections = [
 ];
 
 function App() {
+  const [map, setMap] = useState(null);
   const [addNewPoint, setAddNewPoint] = useState(false);
   const [newPointName, setNewPointName] = useState(null);
   const [points, setPoints] = useState(samplePoints);
@@ -28,6 +29,7 @@ function App() {
   const [isAddMarker, setIsAddMarker] = useState(false);
   const [isAddConnection, setIsAddConnection] = useState(false);
   const [mapType, setMapType] = useState('simple')
+  const [markers, setMarkers] = useState([])
 
   useEffect(()=>{
     const getAllMarkersFromDB = async ()=>{
@@ -35,15 +37,16 @@ function App() {
         const response = await fetch("http://localhost:8080/api/markers")
         const markersFromDB = await response.json()
 
-        console.log("DB test : ");
-        console.log(markersFromDB);
+        if (JSON.stringify(markersFromDB) !== JSON.stringify(markers)) {
+          setMarkers(markersFromDB);
+        }
       } catch (error) {
         console.log(error);
       }
 
     }
     getAllMarkersFromDB();
-  }, [])
+  }, [markers])
 
 
   const addPoint = (newPoint) => {
@@ -124,10 +127,11 @@ function App() {
 
   return (
     <div className="App">
-      <TreeView turnOnIsMarker={turnOnIsMarker} turnOnIsAddConnection={turnOnIsAddConnection}></TreeView>
+      <TreeView turnOnIsMarker={turnOnIsMarker} map={map} setConnections={setConnections} turnOnIsAddConnection={turnOnIsAddConnection}
+       markers={markers} connections={connections} points={points} setPoints={setPoints}></TreeView>
       <DataView></DataView>
       
-      <MapComponent points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
+      <MapComponent map={map} setMap={setMap} points={points} connections={connections} addPoint={addPoint} addConnection={addConnection}
        isAddMarker={isAddMarker} turnOnIsMarker={turnOnIsMarker} isAddConnection={isAddConnection} turnOnIsAddConnection={turnOnIsAddConnection} mapType={mapType}
        removeConnection={removeConnection} newPointName={newPointName} setConnections={setConnections} setPoints={setPoints}></MapComponent>
 
